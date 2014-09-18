@@ -15,7 +15,7 @@
 
 
 static int do_accept(int s);
-static int write_response(int s);
+static int write_response(lingvo_server_request *request, int s);
 
 
 
@@ -54,7 +54,8 @@ int create_server()
 		ret = -1; goto END;
 	}
 
-	while (do_accept(s) != -1) ; ret = -1;
+	while ((ret = do_accept(s)) > 0)
+		;
 
 END:	if (s != -1)
 		close(s);
@@ -82,8 +83,13 @@ static int do_accept(int s)
 		ret = -1; goto END;
 	}
 
-	if (write_response(acc) == -1) {
+	if (write_response(&request, acc) == -1) {
 		ret = -1; goto END;
+	}
+
+	if (strcmp(request.query, "/shutdown") == 0) {
+		printf("shutting down.\n");
+		ret = 0;
 	}
 
 END:	if (acc != -1)
@@ -105,7 +111,7 @@ static char* get_time_str()
 	return timebuf;
 }
 
-static int write_response(int s)
+static int write_response(lingvo_server_request *request, int s)
 {
 	char *str =
 		"HTTP/1.1 200 OK\n"
@@ -113,18 +119,28 @@ static int write_response(int s)
 		"\n"
 		"<html>\n"
 		"<head>\n"
+		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
 		"</head>\n"
 		"<body>\n"
-		"%s\n"
+		"%s<br>\n"
+		"<a href=\"/shutdown\">Завершить работу сервера</a><br>\n"
+		"<form action=\"/\" method=\"post\">\n"
+		"<input type=\"text\" name=\"parameter1\" value=\"value1\">\n"
+		"<input type=\"text\" name=\"parameter2\" value=\"value2\">\n"
+		"<input type=\"submit\" value=\"Go\">\n"
+		"</form>\n"
+		"<pre>\n"
+		"%s"
+		"</pre>\n"
 		"</body>\n"
 		"</html>\n";
 
 	int ret = 1;
-	char buf[1000];
+	char buf[10000];
 	int buf_len;
 
 
-	sprintf(buf, str, get_time_str());
+	sprintf(buf, str, get_time_str(), request->request_string.data);
 
 	buf_len = strlen(buf);
 	if (write(s, buf, buf_len) != buf_len) {
