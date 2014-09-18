@@ -7,23 +7,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <lingvo/lingvo.h>
-#include <domutils/string.h>
 
 #include "core.h"
-
-
-
-
-struct lingvo_server_request_ {
-};
-
-typedef struct lingvo_server_request_ lingvo_server_request;
+#include "lingvo-server-request.h"
 
 
 
 
 static int do_accept(int s);
-static int read_request(int s);
 static int write_response(int s);
 
 
@@ -77,6 +68,8 @@ static int do_accept(int s)
 	lingvo_server_request request;
 
 
+	lingvo_server_request_init(&request);
+
 	acc = accept(s, NULL, NULL);
 	if (acc == -1) {
 		printf("error: %s (%d).\n", strerror(errno), errno);
@@ -85,7 +78,7 @@ static int do_accept(int s)
 
 	fcntl(acc, F_SETFL, fcntl(acc, F_GETFL, 0) | O_NONBLOCK);
 
-	if (read_request(acc) == -1) {
+	if (lingvo_server_request_read(&request, acc) == -1) {
 		ret = -1; goto END;
 	}
 
@@ -95,45 +88,7 @@ static int do_accept(int s)
 
 END:	if (acc != -1)
 		close(acc);
-
-	return ret;
-}
-
-static int read_request(int s)
-{
-	char buf[1000];
-	domutils_string str;
-	int bytes_read, ret = 1;
-
-
-	domutils_string_init(&str);
-
-	for (;;) {
-		bytes_read = read(s, buf, sizeof(buf) - 1);
-
-		if (bytes_read == -1) {
-			if (errno == EAGAIN)
-				continue;
-			else {
-				printf("read(): %s (%d).\n", strerror(errno), errno);
-				ret = -1; goto END;
-			}
-		}
-
-		buf[bytes_read] = '\0';
-		domutils_string_append(&str, buf);
-
-		if (strstr(str.data, "\r\n\r"))
-			break;
-		if (strstr(str.data, "\n\n"))
-			break;
-	}
-
-#if 1
-	printf("Request: '%s'\n", str.data);
-#endif
-
-END:	domutils_string_free(&str);
+	lingvo_server_request_free(&request);
 
 	return ret;
 }

@@ -8,7 +8,7 @@ CC = gcc -std=gnu99
 
 BINS = lingvo-server
 
-lingvo_server_OBJECTS = lingvo-server.o core.o
+lingvo_server_OBJECTS = lingvo-server.o core.o lingvo-server-request.o
 
 LIBS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(LIBS_DEPS))
  
