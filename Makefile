@@ -2,13 +2,13 @@
 include .make_config
 
 export PKG_CONFIG_PATH = $(PREFIX)/lib/pkgconfig:/usr/lib64/pkgconfig 
-export LIBS_DEPS = libdomhp
+export LIBS_DEPS = libdomhp lingvo
 
 CC = gcc -std=gnu99
 
 BINS = lingvo-server
 
-lingvo_server_OBJECTS = lingvo-server.o
+lingvo_server_OBJECTS = lingvo-server.o core.o
 
 LIBS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(LIBS_DEPS))
  
