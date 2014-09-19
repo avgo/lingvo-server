@@ -168,7 +168,6 @@ static void lingvo_server_request_parse(lingvo_server_request *request)
 				number = number * 10 + *c3 - '0';
 
 			request->content_length = number;
-			printf("c-l: %d\n", request->content_length);
 		}
 
 		c1 = c4;
@@ -212,7 +211,7 @@ static void lingvo_server_request_parse_method(lingvo_server_request *request)
 int lingvo_server_request_read(lingvo_server_request *request, int s)
 {
 	const char *terminator;
-	char buf[1000];
+	char buf[50];
 	int bytes_read, ret = 1;
 
 
@@ -237,6 +236,37 @@ int lingvo_server_request_read(lingvo_server_request *request, int s)
 	}
 
 	lingvo_server_request_parse(request);
+
+	if (request->method.id == LINGVO_SERVER_POST) {
+		int bytes_post_loaded =
+			request->request_string.data +
+			request->request_string.size - 1 - terminator;
+		if (bytes_post_loaded >= request->content_length)
+			return ret;
+		int bytes_post_remain = request->content_length - bytes_post_loaded;
+
+		while (bytes_post_remain > 0) {
+			bytes_read = read(s, buf,
+				bytes_post_remain < sizeof(buf) - 1 ?
+				bytes_post_remain : sizeof(buf) - 1);
+
+			if (bytes_read == -1) {
+				if (errno == EAGAIN)
+					continue;
+				else {
+					printf("read(): %s (%d).\n", strerror(errno), errno);
+					ret = -1; goto END;
+				}
+			}
+
+			if (bytes_read == 0)
+				continue;
+			buf[bytes_read] = '\0';
+			domutils_string_append(&request->request_string, buf);
+
+			bytes_post_remain -= bytes_read;
+		}
+	}
 
 END:	return ret;
 }
