@@ -123,6 +123,7 @@ static int write_response(lingvo_server_request *request, int s)
 		"</head>\n"
 		"<body>\n"
 		"%s<br>\n"
+		"<a href=\"/\">home</a><br>\n"
 		"<a href=\"/shutdown\">Завершить работу сервера</a><br>\n"
 		"<form action=\"/\" method=\"post\">\n"
 		"<input type=\"text\" name=\"parameter1\" value=\"value1\">\n"

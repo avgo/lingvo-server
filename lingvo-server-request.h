@@ -28,6 +28,7 @@ typedef struct lingvo_server_method_ lingvo_server_method;
 struct lingvo_server_request_ {
 	domutils_string request_string;
 	lingvo_server_method method;
+	int content_length;
 	char *query;
 };
 
