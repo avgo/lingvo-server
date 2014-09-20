@@ -136,7 +136,7 @@ static int write_response(lingvo_server_request *request, int s)
 		"<input type=\"submit\" value=\"Отправить\">\n"
 		"</form>\n"
 		"<pre>\n"
-		"%s"
+		"%.*s"
 		"</pre>\n"
 		"</body>\n"
 		"</html>\n";
@@ -146,7 +146,7 @@ static int write_response(lingvo_server_request *request, int s)
 	int buf_len;
 
 
-	sprintf(buf, str, get_time_str(), request->request_string.data);
+	sprintf(buf, str, get_time_str(), request->request_string_len, request->request_string);
 
 	buf_len = strlen(buf);
 	if (write(s, buf, buf_len) != buf_len) {
