@@ -83,14 +83,8 @@ static int do_accept(int s)
 		ret = -1; goto END;
 	}
 
-	if (write_response(&request, acc) == -1) {
-		ret = -1; goto END;
-	}
-
-	if (strcmp(request.query, "/shutdown") == 0) {
-		printf("shutting down.\n");
-		ret = 0;
-	}
+	if ((ret = write_response(&request, acc)) < 1)
+		goto END;
 
 END:	if (acc != -1)
 		close(acc);
@@ -152,6 +146,11 @@ static int write_response(lingvo_server_request *request, int s)
 	if (write(s, buf, buf_len) != buf_len) {
 		printf("write(): %s (%u)\n", strerror(errno), errno);
 		ret = -1; goto END;
+	}
+
+	if (strcmp(request->query, "/shutdown") == 0) {
+		printf("shutting down.\n");
+		ret = 0;
 	}
 
 END:	return ret;
