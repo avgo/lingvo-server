@@ -8,8 +8,6 @@
 
 struct lingvo_server_request_;
 
-typedef void (*lingvo_server_request_handler)(struct lingvo_server_request_*);
-
 enum lingvo_server_method_id_ {
 	LINGVO_SERVER_GET = 1,
 	LINGVO_SERVER_POST,
@@ -20,7 +18,6 @@ typedef enum lingvo_server_method_id_ lingvo_server_method_id;
 struct lingvo_server_method_ {
 	char method[10];
 	lingvo_server_method_id id;
-	lingvo_server_request_handler proc;
 };
 
 typedef struct lingvo_server_method_ lingvo_server_method;

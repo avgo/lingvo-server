@@ -10,6 +10,7 @@
 
 #include "core.h"
 #include "lingvo-server-request.h"
+#include "lingvo-server-request-handler.h"
 
 
 
@@ -83,75 +84,13 @@ static int do_accept(int s)
 		ret = -1; goto END;
 	}
 
-	if ((ret = write_response(&request, acc)) < 1)
-		goto END;
+	if (lingvo_server_request_handler(&request, acc) == -1) {
+		ret = -1; goto END;
+	}
 
 END:	if (acc != -1)
 		close(acc);
 	lingvo_server_request_free(&request);
 
 	return ret;
-}
-
-static char* get_time_str()
-{
-	static char timebuf[20];
-	time_t t;
-
-
-	t = time(NULL);
-	strftime(timebuf, sizeof(timebuf), "%F %T", localtime(&t));
-
-	return timebuf;
-}
-
-static int write_response(lingvo_server_request *request, int s)
-{
-	char *str =
-		"HTTP/1.1 200 OK\n"
-		"Content-Type: text/html\n"
-		"\n"
-		"<html>\n"
-		"<head>\n"
-		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
-		"</head>\n"
-		"<body>\n"
-		"%s<br>\n"
-		"<a href=\"/\">home</a><br>\n"
-		"<a href=\"/shutdown\">Завершить работу сервера</a><br>\n"
-		"<form action=\"/\" method=\"post\">\n"
-		"<input type=\"text\" name=\"parameter1\" value=\"value1\">\n"
-		"<input type=\"text\" name=\"parameter2\" value=\"value2\">\n"
-		"<input type=\"submit\" value=\"Go\">\n"
-		"</form>\n"
-		"<form enctype=\"multipart/form-data\" method=\"post\">\n"
-		"файл:\n"
-		"<input name=\"textfile\" type=\"file\" size=\"50\">\n"
-		"<input type=\"submit\" value=\"Отправить\">\n"
-		"</form>\n"
-		"<pre>\n"
-		"%.*s"
-		"</pre>\n"
-		"</body>\n"
-		"</html>\n";
-
-	int ret = 1;
-	char buf[10000];
-	int buf_len;
-
-
-	sprintf(buf, str, get_time_str(), request->request_string_len, request->request_string);
-
-	buf_len = strlen(buf);
-	if (write(s, buf, buf_len) != buf_len) {
-		printf("write(): %s (%u)\n", strerror(errno), errno);
-		ret = -1; goto END;
-	}
-
-	if (strcmp(request->query, "/shutdown") == 0) {
-		printf("shutting down.\n");
-		ret = 0;
-	}
-
-END:	return ret;
 }

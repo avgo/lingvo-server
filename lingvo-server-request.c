@@ -12,19 +12,17 @@
 
 static const char* get_terminator(const char *str, int str_len);
 static int parameter_parse(const char *s1, const char *s1_end, const char *s2);
-static void lingvo_server_request_handler_get(lingvo_server_request *request);
-static void lingvo_server_request_handler_post(lingvo_server_request *request);
 static void lingvo_server_request_parse(lingvo_server_request *request);
 static void lingvo_server_request_parse_method(lingvo_server_request *request);
 
 
 
 
-static lingvo_server_method handlers[] = {
-	{ "GET",  LINGVO_SERVER_GET,  lingvo_server_request_handler_get  },
-	{ "POST", LINGVO_SERVER_POST, lingvo_server_request_handler_post },
+static lingvo_server_method methods[] = {
+	{ "GET",  LINGVO_SERVER_GET  },
+	{ "POST", LINGVO_SERVER_POST },
 };
-int handlers_count = sizeof(handlers) / sizeof(*handlers);
+int methods_count = sizeof(methods) / sizeof(*methods);
 
 
 
@@ -68,16 +66,6 @@ void lingvo_server_request_free(lingvo_server_request *request)
 		free(request->request_string);
 	if (request->query != NULL)
 		free(request->query);
-}
-
-static void lingvo_server_request_handler_get(lingvo_server_request *request)
-{
-	printf("GET!\n");
-}
-
-static void lingvo_server_request_handler_post(lingvo_server_request *request)
-{
-	printf("POST!\n");
 }
 
 void lingvo_server_request_init(lingvo_server_request *request)
@@ -181,8 +169,8 @@ static void lingvo_server_request_parse(lingvo_server_request *request)
 static void lingvo_server_request_parse_method(lingvo_server_request *request)
 {
 	const char *b, *e, *rs_end;
-	lingvo_server_method *handler;
-	lingvo_server_method *handlers_end = handlers + handlers_count;
+	lingvo_server_method *method;
+	lingvo_server_method *methods_end = methods + methods_count;
 
 
 	rs_end = request->request_string + request->request_string_len;
@@ -190,19 +178,19 @@ static void lingvo_server_request_parse_method(lingvo_server_request *request)
 	while (e != rs_end && *e != ' ')
 		++e;
 
-	for (handler = handlers; ; ++handler) {
-		if (handler == handlers_end) {
+	for (method = methods; ; ++method) {
+		if (method == methods_end) {
 			printf("warning: unknown method '%.*s'.\n",
 					(int) (e - b), b);
 			return ;
 		}
 
-		if (parameter_parse(b, e, handler->method) == 0)
+		if (parameter_parse(b, e, method->method) == 0)
 			break;
 
 	}
 
-	memcpy(&request->method, handler, sizeof(lingvo_server_method));
+	memcpy(&request->method, method, sizeof(lingvo_server_method));
 }
 
 int lingvo_server_request_read(lingvo_server_request *request, int s)
