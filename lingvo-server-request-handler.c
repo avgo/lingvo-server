@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -44,6 +45,69 @@ static char* get_time_str()
 	return timebuf;
 }
 
+static int make_message(char **dst_str, int *dst_str_len, int *size_alloc, const char *fmt, va_list ap)
+{
+	char *np;
+	va_list aq;
+
+
+	*size_alloc = 128;
+	*dst_str = malloc(*size_alloc);
+	if (*dst_str == NULL)
+		return -1;
+
+	for (;;) {
+		va_copy(aq, ap);
+		*dst_str_len = vsnprintf(*dst_str, *size_alloc, fmt, aq);
+		va_end(aq);
+
+		if (*dst_str_len > -1 && *dst_str_len < *size_alloc)
+			return 1;
+
+		if (*dst_str_len > -1)
+			*size_alloc = *dst_str_len + 1;
+		else
+			*size_alloc *= 2;
+
+		np = realloc(*dst_str, *size_alloc);
+		if (np == NULL) {
+			free(*dst_str);
+			return -1;
+		}
+		
+		*dst_str = np;
+	}
+}
+
+static int send_response(int sock, const char *str, ...)
+{
+	va_list ap;
+	char *data = NULL;
+	int data_len;
+	int data_alloc;
+	int ret = 1, res;
+
+	va_start(ap, str);
+	res = make_message(&data, &data_len, &data_alloc, str, ap);
+	va_end(ap);
+
+	if (res == -1) {
+		ret = -1; goto END;
+	}
+
+	if (data_len == 0)
+		return 1;
+
+	if (write(sock, data, data_len) != data_len) {
+		printf("write(): %s (%u)\n", strerror(errno), errno);
+		ret = -1; goto END;
+	}
+
+END:	if (data != NULL)
+		free(data);
+	return ret;
+}
+
 static int handler_default(lingvo_server_request *request, int s)
 {
 	char *str =
@@ -75,15 +139,13 @@ static int handler_default(lingvo_server_request *request, int s)
 		"</html>\n";
 
 	int ret = 1;
-	char buf[10000];
-	int buf_len;
 
 
-	sprintf(buf, str, get_time_str(), request->request_string_len, request->request_string);
-
-	buf_len = strlen(buf);
-	if (write(s, buf, buf_len) != buf_len) {
-		printf("write(): %s (%u)\n", strerror(errno), errno);
+	if (send_response(s, str,
+			get_time_str(),
+			request->request_string_len,
+			request->request_string) == -1)
+	{
 		ret = -1; goto END;
 	}
 
@@ -108,17 +170,9 @@ static int handler_err(lingvo_server_request *request, int s)
 		"</html>\n";
 
 	int ret = 1;
-	char buf[10000];
-	int buf_len;
 
 
-	sprintf(buf, str, request->query);
-
-	buf_len = strlen(buf);
-	if (write(s, buf, buf_len) != buf_len) {
-		printf("write(): %s (%u)\n", strerror(errno), errno);
-		ret = -1; goto END;
-	}
+	send_response(s, str, request->query);
 
 END:	return ret;
 }
