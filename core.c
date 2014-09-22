@@ -88,6 +88,9 @@ static int do_accept(int s)
 		ret = -1; goto END;
 	}
 
+	if (request.shutdown == 1)
+		ret = 0;
+
 END:	if (acc != -1)
 		close(acc);
 	lingvo_server_request_free(&request);

@@ -21,12 +21,15 @@ typedef struct req_handler_ req_handler;
 
 
 static int handler_default(lingvo_server_request *request, int s);
+static int handler_err(lingvo_server_request *request, int s);
+static int handler_shutdown(lingvo_server_request *request, int s);
 
 
 
 
 static req_handler handlers[] = {
-	{ "", handler_default },
+	{ "",         handler_default  },
+	{ "shutdown", handler_shutdown },
 };
 static int handlers_count = sizeof(handlers) / sizeof(*handlers);
 
@@ -173,6 +176,35 @@ static int handler_err(lingvo_server_request *request, int s)
 
 
 	send_response(s, str, request->query);
+
+END:	return ret;
+}
+
+static int handler_shutdown(lingvo_server_request *request, int s)
+{
+	char *str =
+		"HTTP/1.1 200 OK\n"
+		"Content-Type: text/html\n"
+		"\n"
+		"<html>\n"
+		"<head>\n"
+		"<title>Завершение работы</title>\n"
+		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
+		"</head>\n"
+		"<body>\n"
+		"Работа сервера будет остановлена.<br>\n"
+		"<a href=\"/\">home</a><br>\n"
+		"</body>\n"
+		"</html>\n";
+
+	int ret = 1;
+
+
+	if (send_response(s, str) == -1)
+	{
+		ret = -1; goto END;
+	}
+	request->shutdown = 1;
 
 END:	return ret;
 }

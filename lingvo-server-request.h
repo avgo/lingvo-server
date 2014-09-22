@@ -28,6 +28,8 @@ struct lingvo_server_request_ {
 	lingvo_server_method method;
 	int content_length;
 	char *query;
+
+	int shutdown;
 };
 
 typedef struct lingvo_server_request_ lingvo_server_request;

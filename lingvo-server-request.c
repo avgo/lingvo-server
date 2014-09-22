@@ -73,6 +73,7 @@ void lingvo_server_request_init(lingvo_server_request *request)
 	request->request_string = NULL;
 	request->query = NULL;
 	request->content_length = 0;
+	request->shutdown = 0;
 }
 
 static void lingvo_server_request_parse(lingvo_server_request *request)
