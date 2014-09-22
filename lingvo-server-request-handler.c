@@ -114,9 +114,6 @@ END:	if (data != NULL)
 static int handler_default(lingvo_server_request *request, int s)
 {
 	char *str =
-		"HTTP/1.1 200 OK\n"
-		"Content-Type: text/html\n"
-		"\n"
 		"<html>\n"
 		"<head>\n"
 		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
@@ -158,9 +155,6 @@ END:	return ret;
 static int handler_err(lingvo_server_request *request, int s)
 {
 	char *str =
-		"HTTP/1.1 200 OK\n"
-		"Content-Type: text/html\n"
-		"\n"
 		"<html>\n"
 		"<head>\n"
 		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
@@ -183,9 +177,6 @@ END:	return ret;
 static int handler_shutdown(lingvo_server_request *request, int s)
 {
 	char *str =
-		"HTTP/1.1 200 OK\n"
-		"Content-Type: text/html\n"
-		"\n"
 		"<html>\n"
 		"<head>\n"
 		"<title>Завершение работы</title>\n"
@@ -219,6 +210,11 @@ int lingvo_server_request_handler(lingvo_server_request *request, int s)
 
 	for (req_handler *h = handlers; h != handlers_end; ++h) {
 		if (strcmp(h->command, q) == 0) {
+			if (send_response(s,
+					"HTTP/1.1 200 OK\n"
+					"Content-Type: text/html\n"
+					"\n") == -1)
+				return -1;
 			h->proc(request, s);
 			return 1;
 		}
