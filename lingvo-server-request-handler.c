@@ -6,6 +6,7 @@
 #include <errno.h>
 
 #include "lingvo-server-request-handler.h"
+#include "doc-template.h"
 
 
 
@@ -113,91 +114,81 @@ END:	if (data != NULL)
 
 static int handler_default(lingvo_server_request *request, int s)
 {
-	char *str =
-		"<html>\n"
-		"<head>\n"
-		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
-		"</head>\n"
-		"<body>\n"
-		"%s<br>\n"
-		"<a href=\"/\">home</a><br>\n"
-		"<a href=\"/shutdown\">Завершить работу сервера</a><br>\n"
-		"<form action=\"/\" method=\"post\">\n"
-		"<input type=\"text\" name=\"parameter1\" value=\"value1\">\n"
-		"<input type=\"text\" name=\"parameter2\" value=\"value2\">\n"
-		"<input type=\"submit\" value=\"Go\">\n"
-		"</form>\n"
-		"<form enctype=\"multipart/form-data\" method=\"post\">\n"
-		"файл:\n"
-		"<input name=\"textfile\" type=\"file\" size=\"50\">\n"
-		"<input type=\"submit\" value=\"Отправить\">\n"
-		"</form>\n"
-		"<pre>\n"
-		"%.*s"
-		"</pre>\n"
-		"</body>\n"
-		"</html>\n";
-
 	int ret = 1;
+	doc_template dt;
+	char *str = NULL;
 
 
-	if (send_response(s, str,
-			get_time_str(),
-			request->request_string_len,
-			request->request_string) == -1)
+	doc_template_init(&dt);
+
+	if (doc_template_open(&dt, "templates/homepage.html") == -1) {
+		ret = -1; goto END;
+	}
+	str = strndup(request->request_string, request->request_string_len);
+	if (str == NULL) {
+		ret = -1; goto END;
+	}
+	if (doc_template_send(&dt, s,
+			"time", get_time_str(),
+			"file", str,
+			NULL) == -1)
 	{
 		ret = -1; goto END;
 	}
 
-END:	return ret;
+END:	doc_template_free(&dt);
+	if (str != NULL)
+		free(str);
+
+	return ret;
 }
 
 static int handler_err(lingvo_server_request *request, int s)
 {
-	char *str =
-		"<html>\n"
-		"<head>\n"
-		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
-		"</head>\n"
-		"<body>\n"
-		"Неизвестное действие '%s'<br>\n"
-		"<a href=\"/\">home</a><br>\n"
-		"<a href=\"/shutdown\">Завершить работу сервера</a><br>\n"
-		"</body>\n"
-		"</html>\n";
-
 	int ret = 1;
+	doc_template dt;
 
 
-	send_response(s, str, request->query);
+	doc_template_init(&dt);
 
-END:	return ret;
+	if (doc_template_open(&dt, "templates/error.html") == -1) {
+		ret = -1; goto END;
+	}
+	if (doc_template_send(&dt, s,
+			"action", request->query,
+			NULL) == -1)
+	{
+		ret = -1; goto END;
+	}
+
+END:	doc_template_free(&dt);
+
+	return ret;
 }
 
 static int handler_shutdown(lingvo_server_request *request, int s)
 {
-	char *str =
-		"<html>\n"
-		"<head>\n"
-		"<title>Завершение работы</title>\n"
-		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">\n"
-		"</head>\n"
-		"<body>\n"
-		"Работа сервера будет остановлена.<br>\n"
-		"<a href=\"/\">home</a><br>\n"
-		"</body>\n"
-		"</html>\n";
-
 	int ret = 1;
+	doc_template dt;
 
 
-	if (send_response(s, str) == -1)
+	doc_template_init(&dt);
+
+	if (doc_template_open(&dt, "templates/shutdown.html") == -1) {
+		ret = -1; goto END;
+	}
+	if (doc_template_send(&dt, s,
+			"time", get_time_str(),
+			NULL) == -1)
 	{
 		ret = -1; goto END;
 	}
+
 	request->shutdown = 1;
 
-END:	return ret;
+END:	doc_template_free(&dt);
+
+	return ret;
 }
 
 int lingvo_server_request_handler(lingvo_server_request *request, int s)
@@ -219,6 +210,12 @@ int lingvo_server_request_handler(lingvo_server_request *request, int s)
 			return 1;
 		}
 	}
+
+	if (send_response(s,
+			"HTTP/1.1 200 OK\n"
+			"Content-Type: text/html\n"
+			"\n") == -1)
+		return -1;
 
 	if (handler_err(request, s) == -1)
 		return -1;
