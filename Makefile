@@ -14,7 +14,8 @@ lingvo_server_OBJECTS = \
 	lingvo-server.o \
 	lingvo-server-request.o \
 	lingvo-server-request-handler.o \
-	lingvo-server-utils.o
+	lingvo-server-utils.o \
+	multipart-data.o
 
 test_OBJECTS = \
 	doc-template.o \

@@ -3,6 +3,8 @@
 
 #include <domutils/string.h>
 
+#include "multipart-data.h"
+
 
 
 
@@ -28,6 +30,8 @@ struct lingvo_server_request_ {
 	lingvo_server_method method;
 	int content_length;
 	char *query;
+	char *mp_data_boundary;
+	multipart_data mp_data;
 
 	int shutdown;
 };

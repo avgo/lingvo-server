@@ -11,9 +11,14 @@
 
 
 
+static const char* get_boundary(const char *str, int str_len, const char *boundary);
 static const char* get_terminator(const char *str, int str_len);
 static void lingvo_server_request_parse(lingvo_server_request *request);
 static void lingvo_server_request_parse_method(lingvo_server_request *request);
+static void lingvo_server_request_parse_multipart_form_data(
+		lingvo_server_request *request,
+		const char *s, const char *s_end);
+static int lingvo_server_request_post_data(lingvo_server_request *request);
 
 
 
@@ -26,6 +31,31 @@ int methods_count = sizeof(methods) / sizeof(*methods);
 
 
 
+
+static const char* get_boundary(const char *str, int str_len, const char *boundary)
+{
+	const char *b, *b_end, *s, *str_end;
+	int b_len;
+
+
+	b_len = strlen(boundary);
+	if (str_len < b_len)
+		return NULL;
+
+	str_end = str + str_len - b_len + 1;
+	b_end = boundary + b_len;
+
+	for ( ; str != str_end; ++str)
+
+	for (s = str, b = boundary; ; ++s, ++b) {
+		if (b == b_end)
+			return str;
+		if (*s != *b)
+			break;
+	}
+
+	return NULL;
+}
 
 static const char* get_terminator(const char *str, int str_len)
 {
@@ -52,6 +82,9 @@ void lingvo_server_request_free(lingvo_server_request *request)
 		free(request->request_string);
 	if (request->query != NULL)
 		free(request->query);
+	if (request->mp_data_boundary != NULL)
+		free(request->mp_data_boundary);
+	multipart_data_free(&request->mp_data);
 }
 
 void lingvo_server_request_init(lingvo_server_request *request)
@@ -60,6 +93,9 @@ void lingvo_server_request_init(lingvo_server_request *request)
 	request->query = NULL;
 	request->content_length = 0;
 	request->shutdown = 0;
+	request->mp_data_boundary = NULL;
+
+	multipart_data_init(&request->mp_data);
 }
 
 static void lingvo_server_request_parse(lingvo_server_request *request)
@@ -140,6 +176,9 @@ static void lingvo_server_request_parse(lingvo_server_request *request)
 
 			request->content_length = number;
 		}
+		else
+		if (parameter_parse(c1, c2, "Content-Type") == 0)
+			lingvo_server_request_parse_multipart_form_data(request, c3, c4);
 
 		c1 = c4;
 		if (*c1 == '\r')
@@ -151,6 +190,72 @@ static void lingvo_server_request_parse(lingvo_server_request *request)
 			return ;
 		}
 	}
+}
+
+static void lingvo_server_request_parse_multipart_form_data(
+		lingvo_server_request *request,
+		const char *str, const char *str_end)
+{
+	const char *p1, *p2;
+
+
+	for (p1 = str; ; ++p1) {
+		if (p1 == str_end)
+			return ;
+		if (*p1 == ';')
+			break;
+	}
+	if (parameter_parse(str, p1, "multipart/form-data") != 0)
+		return ;
+	for (++p1; ; ++p1) {
+		if (p1 == str_end)
+			return ;
+		if (*p1 != ' ')
+			break;
+	}
+
+	for (p2 = p1; ; ++p2) {
+		if (p2 == str_end)
+			return ;
+		if (*p2 == ' ' || *p2 == '=')
+			break;
+	}
+
+#if 0
+	printf("'%.*s'\n", (int) (str_end - p1), p1);
+#endif
+
+	if (parameter_parse(p1, p2, "boundary") != 0)
+		return ;
+
+	for ( ; ; ++p2) {
+		if (p2 == str_end)
+			return ;
+		if (*p2 != ' ')
+			break;
+	}
+
+	if (*p2 != '=')
+		return ;
+
+	for (p1 = p2 + 1; ; ++p1) {
+		if (p1 == str_end)
+			return ;
+		if (*p1 != ' ')
+			break;
+	}
+#if 0
+	printf("'%.*s'\n", (int) (str_end - p1), p1);
+#endif
+	request->mp_data_boundary = malloc(str_end - p1 + 4 + 1);
+	if (request->mp_data_boundary == NULL) {
+		return ;
+	}
+
+	sprintf(request->mp_data_boundary, "\r\n--%.*s", (int) (str_end - p1), p1);
+#if 0
+	printf("'%s'\n", request->mp_data_boundary);
+#endif
 }
 
 static void lingvo_server_request_parse_method(lingvo_server_request *request)
@@ -178,6 +283,47 @@ static void lingvo_server_request_parse_method(lingvo_server_request *request)
 	}
 
 	memcpy(&request->method, method, sizeof(lingvo_server_method));
+}
+
+static int lingvo_server_request_post_data(lingvo_server_request *request)
+{
+	const char *str, *str_end;
+	int str_len;
+	int b_len;
+
+
+	if (request->mp_data_boundary == NULL)
+		return 1;
+
+	str = request->request_string;
+	str_len = request->request_string_len;
+
+	b_len = strlen(request->mp_data_boundary);
+
+	str = get_boundary(str, str_len, request->mp_data_boundary);
+
+	if (str == NULL)
+		return 1;
+
+	str += b_len;
+	if (*str == '\r') ++str;
+	if (*str == '\n') ++str;
+	str_len = request->request_string_len -
+			(str - request->request_string);
+
+	while (str_end = get_boundary(str, str_len, request->mp_data_boundary)) {
+		if (multipart_data_add_frame(&request->mp_data, str, str_end) == -1) {
+			return -1;
+		}
+
+		str = str_end + b_len;
+		if (*str == '\r') ++str;
+		if (*str == '\n') ++str;
+		str_len = request->request_string_len -
+				(str - request->request_string);
+	}
+
+	return 1;
 }
 
 int lingvo_server_request_read(lingvo_server_request *request, int s)
@@ -279,6 +425,9 @@ int lingvo_server_request_read(lingvo_server_request *request, int s)
 
 	request->request_string = buffer;
 	request->request_string_len = buffer_size;
+
+	if (lingvo_server_request_post_data(request) == -1)
+		return -1;
 
 END:	return ret;
 }
