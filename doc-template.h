@@ -7,9 +7,11 @@
 
 
 struct dte_link_ {
-	char *name;
-	char *name_end;
-	char *value;
+	const char *pat;
+	const char *pat_end;
+	const char *text;
+	const char *text_end;
+	struct dte_link_ *next;
 };
 
 typedef struct dte_link_ dte_link;
@@ -28,6 +30,7 @@ typedef struct doc_template_ doc_template;
 void doc_template_free(doc_template *dte);
 void doc_template_init(doc_template *dte);
 int doc_template_open(doc_template *dte, const char *filename);
+int doc_template_send(doc_template *dte, int sock, ...);
 
 
 

@@ -10,14 +10,16 @@ BINS = lingvo-server test
 
 lingvo_server_OBJECTS = \
 	core.o \
+	doc-template.o \
 	lingvo-server.o \
 	lingvo-server-request.o \
 	lingvo-server-request-handler.o \
-	doc-template.o
+	lingvo-server-utils.o
 
 test_OBJECTS = \
-	test.o \
-	doc-template.o
+	doc-template.o \
+	lingvo-server-utils.o \
+	test.o
 
 OBJECTS = $(test_OBJECTS) $(filter-out $(test_OBJECTS),$(lingvo_server_OBJECTS))
 

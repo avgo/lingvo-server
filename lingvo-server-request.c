@@ -6,12 +6,12 @@
 #include <ctype.h>
 
 #include "lingvo-server-request.h"
+#include "lingvo-server-utils.h"
 
 
 
 
 static const char* get_terminator(const char *str, int str_len);
-static int parameter_parse(const char *s1, const char *s1_end, const char *s2);
 static void lingvo_server_request_parse(lingvo_server_request *request);
 static void lingvo_server_request_parse_method(lingvo_server_request *request);
 
@@ -44,20 +44,6 @@ static const char* get_terminator(const char *str, int str_len)
 	}
 
 	return NULL;
-}
-
-static int parameter_parse(const char *s1, const char *s1_end, const char *s2)
-{
-	for ( ; ; ++s1, ++s2) {
-		if (s1 == s1_end) {
-			if (*s2 == '\0')
-				return 0;
-			else
-				return *s2;
-		}
-		if (*s2 == '\0')
-			return -*s1;
-	}
 }
 
 void lingvo_server_request_free(lingvo_server_request *request)

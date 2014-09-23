@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 
 	doc_template_init(&dt);
 	doc_template_open(&dt, argv[1]);
+	doc_template_send(&dt, 0, "time", "00:00", "file", "FILE.TXT", NULL);
 	doc_template_free(&dt);
 
 	return 0;
