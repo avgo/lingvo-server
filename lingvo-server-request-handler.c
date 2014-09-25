@@ -24,6 +24,7 @@ typedef struct req_handler_ req_handler;
 static int handler_default(lingvo_server_request *request, int s);
 static int handler_err(lingvo_server_request *request, int s);
 static int handler_shutdown(lingvo_server_request *request, int s);
+static int handler_test(lingvo_server_request *request, int s);
 
 
 
@@ -31,6 +32,7 @@ static int handler_shutdown(lingvo_server_request *request, int s);
 static req_handler handlers[] = {
 	{ "",         handler_default  },
 	{ "shutdown", handler_shutdown },
+	{ "test",     handler_test     },
 };
 static int handlers_count = sizeof(handlers) / sizeof(*handlers);
 
@@ -130,7 +132,6 @@ static int handler_default(lingvo_server_request *request, int s)
 	}
 	if (doc_template_send(&dt, s,
 			"time", get_time_str(),
-			"file", str,
 			NULL) == -1)
 	{
 		ret = -1; goto END;
@@ -191,6 +192,28 @@ END:	doc_template_free(&dt);
 	return ret;
 }
 
+static int handler_test(lingvo_server_request *request, int s)
+{
+	int ret = 1;
+	doc_template dt;
+
+
+	doc_template_init(&dt);
+
+	if (doc_template_open(&dt, "templates/test.html") == -1) {
+		ret = -1; goto END;
+	}
+	if (doc_template_send(&dt, s,
+			NULL) == -1)
+	{
+		ret = -1; goto END;
+	}
+
+END:	doc_template_free(&dt);
+
+	return ret;
+}
+
 int lingvo_server_request_handler(lingvo_server_request *request, int s)
 {
 	req_handler *handlers_end = handlers + handlers_count;
@@ -206,7 +229,8 @@ int lingvo_server_request_handler(lingvo_server_request *request, int s)
 					"Content-Type: text/html\n"
 					"\n") == -1)
 				return -1;
-			h->proc(request, s);
+			if (h->proc(request, s) == -1)
+				return -1;
 			return 1;
 		}
 	}
