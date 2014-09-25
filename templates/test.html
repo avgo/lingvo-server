@@ -2,6 +2,26 @@
 <head>
 <title>Тестовая страница Lingvo Server</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<script>
+var file_index = 2;
+
+function add_element() {
+    var files_container = document.getElementById("files_container");
+    var cont = document.createTextNode("text");
+    var br = document.createElement("br");
+
+    var new_file = document.createElement("input");
+
+    new_file.setAttribute("type", "file");
+    new_file.setAttribute("size", "50");
+    new_file.setAttribute("name", "textfile" + file_index);
+
+    ++file_index;
+
+    files_container.appendChild(new_file);
+    files_container.appendChild(br);
+}
+</script>
 </head>
 <body>
 <h1>Тестовая страница Lingvo Server</h1>
@@ -15,7 +35,10 @@
 </form>
 <form enctype="multipart/form-data" method="post">
 файл:<br>
-<input name="textfile1" type="file" size="50">
+<span id="files_container">
+<input type="file" name="textfile1" size="50"><br>
+</span>
+<input type="button" value="+" onclick="add_element()">
 <input name="hidden1" type="hidden" value="hidden1value"><br>
 <input name="text1" type="text" size="50" value="text1value"><br>
 <input type="submit" value="Отправить">
@@ -25,3 +48,5 @@
 </pre>
 </body>
 </html>
+
+<!-- vim: set expandtab ts=4 : //-->
