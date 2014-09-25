@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
 #include <domutils/string.h>
 
 #include "lingvo-server-request.h"
@@ -5,6 +8,24 @@
 
 
 
+
+static int save_file(const char *filename, const char *b, const char *e)
+{
+	int f = -1;
+	char buf[1000];
+
+
+	snprintf(buf, sizeof(buf), "/tmp/saved_%s", filename);
+	f = open(buf, O_CREAT | O_WRONLY, 0644);
+
+	if (f == -1) {
+		printf("err\n");
+		return -1;
+	}
+
+	write(f, b, e - b);
+	close(f);
+}
 
 int handler_test(lingvo_server_request *request, int s)
 {
