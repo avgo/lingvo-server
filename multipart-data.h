@@ -5,8 +5,8 @@
 
 
 struct multipart_data_frame_ {
-	char *file_b;
-	char *file_e;
+	const char *file_b;
+	const char *file_e;
 	char *content_type;
 	char *name;
 	char *filename;
