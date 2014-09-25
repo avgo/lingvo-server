@@ -1,4 +1,3 @@
-#include <time.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
@@ -6,7 +5,6 @@
 #include <errno.h>
 
 #include "lingvo-server-request-handler.h"
-#include "doc-template.h"
 
 
 
@@ -21,10 +19,10 @@ typedef struct req_handler_ req_handler;
 
 
 
-static int handler_default(lingvo_server_request *request, int s);
-static int handler_err(lingvo_server_request *request, int s);
-static int handler_shutdown(lingvo_server_request *request, int s);
-static int handler_test(lingvo_server_request *request, int s);
+int handler_default(lingvo_server_request *request, int s);
+int handler_err(lingvo_server_request *request, int s);
+int handler_shutdown(lingvo_server_request *request, int s);
+int handler_test(lingvo_server_request *request, int s);
 
 
 
@@ -38,18 +36,6 @@ static int handlers_count = sizeof(handlers) / sizeof(*handlers);
 
 
 
-
-static char* get_time_str()
-{
-	static char timebuf[20];
-	time_t t;
-
-
-	t = time(NULL);
-	strftime(timebuf, sizeof(timebuf), "%F %T", localtime(&t));
-
-	return timebuf;
-}
 
 static int make_message(char **dst_str, int *dst_str_len, int *size_alloc, const char *fmt, va_list ap)
 {
@@ -111,106 +97,6 @@ static int send_response(int sock, const char *str, ...)
 
 END:	if (data != NULL)
 		free(data);
-	return ret;
-}
-
-static int handler_default(lingvo_server_request *request, int s)
-{
-	int ret = 1;
-	doc_template dt;
-	char *str = NULL;
-
-
-	doc_template_init(&dt);
-
-	if (doc_template_open(&dt, "templates/homepage.html") == -1) {
-		ret = -1; goto END;
-	}
-	str = strndup(request->request_string, request->request_string_len);
-	if (str == NULL) {
-		ret = -1; goto END;
-	}
-	if (doc_template_send(&dt, s,
-			"time", get_time_str(),
-			NULL) == -1)
-	{
-		ret = -1; goto END;
-	}
-
-END:	doc_template_free(&dt);
-	if (str != NULL)
-		free(str);
-
-	return ret;
-}
-
-static int handler_err(lingvo_server_request *request, int s)
-{
-	int ret = 1;
-	doc_template dt;
-
-
-	doc_template_init(&dt);
-
-	if (doc_template_open(&dt, "templates/error.html") == -1) {
-		ret = -1; goto END;
-	}
-	if (doc_template_send(&dt, s,
-			"action", request->query,
-			NULL) == -1)
-	{
-		ret = -1; goto END;
-	}
-
-END:	doc_template_free(&dt);
-
-	return ret;
-}
-
-static int handler_shutdown(lingvo_server_request *request, int s)
-{
-	int ret = 1;
-	doc_template dt;
-
-
-	doc_template_init(&dt);
-
-	if (doc_template_open(&dt, "templates/shutdown.html") == -1) {
-		ret = -1; goto END;
-	}
-	if (doc_template_send(&dt, s,
-			"time", get_time_str(),
-			NULL) == -1)
-	{
-		ret = -1; goto END;
-	}
-
-	request->shutdown = 1;
-
-END:	doc_template_free(&dt);
-
-	return ret;
-}
-
-static int handler_test(lingvo_server_request *request, int s)
-{
-	int ret = 1;
-	doc_template dt;
-
-
-	doc_template_init(&dt);
-
-	if (doc_template_open(&dt, "templates/test.html") == -1) {
-		ret = -1; goto END;
-	}
-	if (doc_template_send(&dt, s,
-			NULL) == -1)
-	{
-		ret = -1; goto END;
-	}
-
-END:	doc_template_free(&dt);
-
 	return ret;
 }
 

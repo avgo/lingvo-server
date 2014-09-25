@@ -11,6 +11,10 @@ BINS = lingvo-server test
 lingvo_server_OBJECTS = \
 	core.o \
 	doc-template.o \
+	handler-default.o \
+	handler-err.o \
+	handler-shutdown.o \
+	handler-test.o \
 	lingvo-server.o \
 	lingvo-server-request.o \
 	lingvo-server-request-handler.o \
