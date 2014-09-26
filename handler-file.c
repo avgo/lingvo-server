@@ -8,11 +8,39 @@
 
 
 
-static int fill_wordlist(const char *filename, domutils_string *str)
+static int fill_wordlist(const char *filename, domutils_string *result_str)
 {
-	domutils_string_append_printf(str, "файл: '%s'", filename);
+	int ret = 1;
+	domutils_string str;
+	lingvo_word_list_stw wl_stw;
 
-	return 1;
+
+	domutils_string_init(&str);
+	lingvo_word_list_stw_init(&wl_stw);
+
+
+	if (domhp_file_to_domutils_str(filename, &str, 1 << 20) == -1) {
+		ret = -1; goto END;
+	}
+
+	if (lingvo_word_list_stw_create(&wl_stw, str.data) == -1) {
+		ret = -1; goto END;
+	}
+
+	domutils_string_append(result_str, "");
+
+	lingvo_word_list_stw_node *node;
+
+	for (node = wl_stw.first; node != NULL; node = node->next) {
+		domutils_string_append_printf(result_str, "%.*s<br>",
+				(int) (node->occ_first->end - node->occ_first->begin),
+				str.data + node->occ_first->begin);
+	}
+
+END:	domutils_string_free(&str);
+	lingvo_word_list_stw_free(&wl_stw);
+
+	return ret;
 }
 
 static const char* get_filename(const char *dir, const char *str)
@@ -49,6 +77,7 @@ int handler_file(lingvo_server_request *request, int s)
 
 	fill_wordlist(get_filename(LINGVO_FILES_DIR, request->query),
 			&str);
+
 	if (doc_template_open(&dt, "templates/file.html") == -1) {
 		ret = -1; goto END;
 	}
