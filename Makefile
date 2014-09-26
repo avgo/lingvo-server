@@ -13,6 +13,7 @@ lingvo_server_OBJECTS = \
 	doc-template.o \
 	handler-default.o \
 	handler-err.o \
+	handler-file.o \
 	handler-shutdown.o \
 	handler-test.o \
 	lingvo-server.o \
