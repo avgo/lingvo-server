@@ -112,6 +112,12 @@ void multipart_data_free(multipart_data *mp_data)
 	multipart_data_frame *f, *next;
 
 	for (f = mp_data->first; f != NULL; f = next) {
+		if (f->name != NULL)
+			free(f->name);
+		if (f->filename != NULL)
+			free(f->filename);
+		if (f->content_type != NULL)
+			free(f->content_type);
 		next = f->next;
 		free(f);
 	}
