@@ -61,8 +61,11 @@ int handler_test(lingvo_server_request *request, int s)
 			f != NULL; f = f->next)
 	{
 		if (f->filename != NULL && f->filename[0] != '\0') {
-			domutils_string_append(&str, f->filename);
-			domutils_string_append(&str, "\n");
+			domutils_string_append_printf(&str,
+					"%s (%s, %ld байт)\n",
+					f->filename,
+					f->content_type,
+					(int) (f->file_e - f->file_b));
 		}
 	}
 

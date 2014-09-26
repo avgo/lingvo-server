@@ -26,6 +26,8 @@ test_OBJECTS = \
 	lingvo-server-utils.o \
 	test.o
 
+DEFINES = -DLINGVO_FILES_DIR=\"$(LINGVO_FILES_DIR)\"
+
 OBJECTS = $(test_OBJECTS) $(filter-out $(test_OBJECTS),$(lingvo_server_OBJECTS))
 
 LIBS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(LIBS_DEPS))
@@ -36,7 +38,10 @@ INCLUDE = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(LIBS_
 all: $(BINS)
 
 $(OBJECTS): %.o : %.c
-	$(CC) $(INCLUDE) -c $*.c
+	$(CC) $(DEFINES) $(INCLUDE) -c -o $@ $*.c
+ifeq ($(is_preproc),yes)
+	$(CC) -E $(DEFINES) $(INCLUDE) -c -o $*.i $*.c
+endif
 
 lingvo-server: $(lingvo_server_OBJECTS)
 	$(CC) -o lingvo-server $(lingvo_server_OBJECTS) $(LIBS)

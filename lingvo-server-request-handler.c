@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #include "lingvo-server-request-handler.h"
+#include "lingvo-server-utils.h"
 
 
 
@@ -103,13 +104,15 @@ END:	if (data != NULL)
 int lingvo_server_request_handler(lingvo_server_request *request, int s)
 {
 	req_handler *handlers_end = handlers + handlers_count;
-	char *q = request->query;
+	char *q = request->query, *q_end;
 
 	for ( ; *q == '/'; ++q)
 		;
+	for (q_end = q; *q_end != '\0' && *q_end != '/'; ++q_end)
+		;
 
 	for (req_handler *h = handlers; h != handlers_end; ++h) {
-		if (strcmp(h->command, q) == 0) {
+		if (parameter_parse(q, q_end, h->command) == 0) {
 			if (send_response(s,
 					"HTTP/1.1 200 OK\n"
 					"Content-Type: text/html\n"
