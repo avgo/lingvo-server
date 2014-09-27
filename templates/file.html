@@ -2,15 +2,23 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf8">
   <title>File Server</title>
+  <style>
+  .not_alpha {
+    background-color: #ffaaaa;
+    color: #ffffff;
+    font-size: 10pt;
+    font-weight: bold;
+  }
+  </style>
 </head>
 <body>
   <h1>File</h1>
   <a href="/">home</a>
   <a href="/shutdown">Завершить работу сервера</a><br>
-  <table width="100%">
+  <table border width="800">
     <tr>
       <td><?wordlist?></td>
-      <td>2</td>
+      <td align="left" valign="top"><?file?></td>
     </tr>
   </table>
 </body>
