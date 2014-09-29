@@ -94,6 +94,7 @@ int doc_template_pat_subs_correspondence(doc_template *dte, va_list list)
 {
 	va_list aq;
 	char *pat, *sub;
+	int is_absent;
 
 
 	while (pat = va_arg(list, char*)) {
@@ -102,12 +103,9 @@ int doc_template_pat_subs_correspondence(doc_template *dte, va_list list)
 			return -1;
 		}
 
-		for (dte_link *l = dte->first; ; l = l->next) {
-			if (l == NULL) {
-				printf("warning: Pattern '%s' is absent in the document.\n",
-						pat);
-				break;
-			}
+		is_absent = 1;
+
+		for (dte_link *l = dte->first; l != NULL; l = l->next) {
 			if (l->pat != NULL && parameter_parse(
 					l->pat,
 					l->pat_end,
@@ -115,8 +113,14 @@ int doc_template_pat_subs_correspondence(doc_template *dte, va_list list)
 			{
 				l->text = sub;
 				l->text_end = sub + strlen(sub);
-				break;
+				is_absent = 0;
 			}
+		}
+
+		if (is_absent == 1) {
+			printf("warning: Pattern '%s' is absent in the document.\n",
+					pat);
+			break;
 		}
 	}
 
