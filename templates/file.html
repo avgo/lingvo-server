@@ -11,17 +11,16 @@
   }
   </style>
 </head>
-<body>
-  <h1>File</h1>
-  <a href="/">home</a>
-  <a href="/shutdown">Завершить работу сервера</a><br>
-  <table border width="800">
-    <tr>
-      <td><?wordlist?></td>
-      <td align="left" valign="top"><?file?></td>
-    </tr>
-  </table>
-</body>
+<frameset rows="30,*">
+  <frame src="/file/<?filename?>/top" name="frame_top">
+  <frameset cols="300,*">
+    <frame src="/file/<?filename?>/wordlist" name="frame_wordlist" scrolling="yes">
+    <frameset rows="*,300">
+      <frame src="/file/<?filename?>/file" name="frame_file" scrolling="yes">
+      <frame src="/file/<?filename?>/card" name="frame_card">
+    </frameset>
+  </frameset>
+</frameset>
 </html>
 
 <!-- vim: set expandtab ts=2 : //-->
