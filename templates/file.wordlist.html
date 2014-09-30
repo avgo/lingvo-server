@@ -10,11 +10,22 @@
     font-weight: bold;
   }
   </style>
+  <script>
+    function form_load() {
+      var html = "<table>";
+      for (var i = 0; i < top.wordlist.length; ++i) {
+        html +=
+          "<tr>\n" +
+          "<td onclick=\"top.select_word(" + i + ")\">" + top.wordlist[i].word + "</td>\n" +
+          "<td>" + top.wordlist[i].count + "</td>\n" +
+          "</tr>\n";
+      }
+      html += "</table>";
+      document.body.innerHTML = html;
+    }
+  </script>
 </head>
-<body>
-  <table>
-    <?wordlist?>
-  </table>
+<body onload="form_load()">
 </body>
 </html>
 

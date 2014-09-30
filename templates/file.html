@@ -10,6 +10,28 @@
     font-weight: bold;
   }
   </style>
+  <script>
+    var wordlist = [
+      <?wordlist?>
+    ];
+    var cur_word_index = 0;
+
+    function select_word(index) {
+      var html = "";
+      var wordpositions = wordlist[index].wordpositions;
+
+      cur_word_index = index;
+
+      html =
+        "Слово: " + wordlist[index].word + "<br>\n" +
+        "Словопозиции:";
+      for (var i = 0; i < wordpositions.length; ++i) {
+        html += " " + wordpositions[i];
+      }
+
+      top.frame_card.document.body.innerHTML = html;
+    }
+  </script>
 </head>
 <frameset rows="30,*">
   <frame src="/file/<?filename?>/top" name="frame_top">
