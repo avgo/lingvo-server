@@ -1,0 +1,60 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>words</title>
+<style>
+  td.td1 {
+    text-align: center;
+    vertical-align: top;
+  }
+  td.td2 {
+    text-align: right;
+    vertical-align: top;
+  }
+</style>
+<script>
+  var arr1 = [
+    { word: "word1", count: 45, positions: [ 33, 56, 77 ] },
+    { word: "word2", count: 46, positions: [ 49, 56, 90, 105 ] },
+    { word: "word3", count: 12, positions: [ 56, 89, 122, 130, 156, 161 ] },
+  ];
+  function f() {
+    var html =
+        "<table border>\n" +
+        "<tr>\n" +
+        "<td colspan=\"3\">Количество слов: " + arr1.length + "</td>" +
+        "</tr>\n" +
+        "<tr>\n" +
+        "<td>Слово</td>\n" +
+        "<td>Количество слов в тексте</td>\n" +
+        "<td>Словопозиции</td>\n" +
+        "</tr>\n"
+        ;
+
+    for (var i = 0; i < arr1.length; ++i) {
+      html +=
+          "<tr>\n" +
+          "<td class=\"td1\">" + arr1[i].word + "</td>" +
+          "<td class=\"td2\">" + arr1[i].count + "</td>" +
+          "<td class=\"td2\">";
+      var arr2 = arr1[i].positions;
+      for (var j = 0; j < arr2.length; ++j) {
+        html += arr2[j] + "<br>";
+      }
+      html += "</td></tr>";
+    }
+
+    html += "</table>\n";
+
+    div1.innerHTML = html;
+  }
+</script>
+</head>
+<body onload="f()">
+  <a href="#" onclick="f()">REFERENCE</a>
+  <div id="div1" style="width: 100%; background-color: #FF9999">
+  </div>
+</body>
+</html>
+
+<!-- vim: set expandtab ts=2 : //-->
