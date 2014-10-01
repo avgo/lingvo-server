@@ -92,7 +92,7 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 
 		int count = 0;
 
-		for (lingvo_word_list_stw_occ_node *occ_node = node->occ_first;
+		for (lingvo_word_list_stw_occ_node *occ_node = node->occ.first;
 					occ_node != NULL;
 					occ_node = occ_node->next)
 		{
@@ -100,8 +100,8 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 		}
 
 		escape_string(&esc_str,
-			file_str->data + node->occ_first->begin,
-			(int) (node->occ_first->end - node->occ_first->begin));
+			file_str->data + node->occ.first->begin,
+			(int) (node->occ.first->end - node->occ.first->begin));
 		escape_string_to_js(&esc_str2, esc_str.data, esc_str.size - 1);
 		
 		domutils_string_append_printf(result_str,
@@ -110,7 +110,7 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 
 		next_line = "";
 
-		for (lingvo_word_list_stw_occ_node *occ_node = node->occ_first;
+		for (lingvo_word_list_stw_occ_node *occ_node = node->occ.first;
 					occ_node != NULL;
 					occ_node = occ_node->next)
 		{
