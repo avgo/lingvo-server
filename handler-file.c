@@ -63,15 +63,13 @@ static int escape_string_to_js(domutils_string *esc_str_for_js,
 	}
 }
 
-static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
+static int fill_wordlist(domutils_string *file_str,
+		domutils_string *result_str, domutils_string *file_text)
 {
 	int ret = 1;
-	domutils_string esc_str, esc_str2;
 	lingvo_word_list_stw wl_stw;
 
 
-	domutils_string_init(&esc_str);
-	domutils_string_init(&esc_str2);
 	lingvo_word_list_stw_init(&wl_stw);
 
 
@@ -85,10 +83,12 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 	const char *next_line = "";
 
 	for (node = wl_stw.first; node != NULL; node = node->next) {
-		domutils_string_free(&esc_str);
+		domutils_string esc_str, esc_str2;
+
+
 		domutils_string_init(&esc_str);
-		domutils_string_free(&esc_str2);
 		domutils_string_init(&esc_str2);
+
 
 		int count = 0;
 
@@ -103,7 +103,7 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 			file_str->data + node->occ.first->begin,
 			(int) (node->occ.first->end - node->occ.first->begin));
 		escape_string_to_js(&esc_str2, esc_str.data, esc_str.size - 1);
-		
+
 		domutils_string_append_printf(result_str,
 				"%s{ word: \"%s\", count: %d, wordpositions: [ ",
 				next_line, esc_str2.data, count);
@@ -121,10 +121,30 @@ static int fill_wordlist(domutils_string *file_str, domutils_string *result_str)
 		domutils_string_append(result_str, " ] }");
 
 		next_line = ",\n      ";
+
+		domutils_string_free(&esc_str);
+		domutils_string_free(&esc_str2);
+	}
+
+	for (lingvo_word_list_stw_occ_node *occ_node = wl_stw.occ.first;
+			occ_node != NULL; occ_node = occ_node->next)
+	{
+		domutils_string word;
+
+
+		domutils_string_init(&word);
+
+		domutils_string_append_printf(&word,
+				"<span id=\"word_%d\">%.*s</span>",
+				occ_node->begin,
+				occ_node->end - occ_node->begin,
+				file_str->data + occ_node->begin);
+		escape_string_to_js(file_text, word.data, word.size - 1);
+
+		domutils_string_free(&word);
 	}
 
 END:	lingvo_word_list_stw_free(&wl_stw);
-	domutils_string_free(&esc_str);
 
 	return ret;
 }
@@ -214,11 +234,13 @@ int handler_file(lingvo_server_request *request, int s)
 	doc_template dt;
 	domutils_string str;
 	domutils_string file_str;
+	domutils_string file_text;
 	handler_file_options opt;
 
 
 	doc_template_init(&dt);
 	domutils_string_init(&file_str);
+	domutils_string_init(&file_text);
 	domutils_string_init(&str);
 	handler_file_options_init(&opt);
 
@@ -236,7 +258,7 @@ int handler_file(lingvo_server_request *request, int s)
 			ret = -1; goto END;
 		}
 
-		fill_wordlist(&file_str, &str);
+		fill_wordlist(&file_str, &str, &file_text);
 	
 		if (doc_template_open(&dt, "templates/file.html") == -1) {
 			ret = -1; goto END;
@@ -244,6 +266,7 @@ int handler_file(lingvo_server_request *request, int s)
 	
 		if (doc_template_send(&dt, s,
 				"filename", opt.filename,
+				"file_text", file_text.data,
 				"wordlist", str.data,
 				NULL) == -1)
 		{
@@ -276,18 +299,11 @@ int handler_file(lingvo_server_request *request, int s)
 	}
 	else
 	if (strcmp(opt.action, "file") == 0) {
-		if (domhp_file_to_domutils_str(get_filename(
-				LINGVO_FILES_DIR, opt.filename),
-				&file_str, 1 << 20) == -1) {
-			ret = -1; goto END;
-		}
-	
 		if (doc_template_open(&dt, "templates/file.file.html") == -1) {
 			ret = -1; goto END;
 		}
 	
 		if (doc_template_send(&dt, s,
-				"file",     file_str.data,
 				NULL) == -1)
 		{
 			ret = -1; goto END;
@@ -323,6 +339,7 @@ int handler_file(lingvo_server_request *request, int s)
 END:	doc_template_free(&dt);
 	domutils_string_free(&str);
 	domutils_string_free(&file_str);
+	domutils_string_free(&file_text);
 	handler_file_options_free(&opt);
 
 	return ret;

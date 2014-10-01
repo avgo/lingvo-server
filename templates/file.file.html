@@ -10,9 +10,13 @@
     font-weight: bold;
   }
   </style>
+  <script>
+    function form_load() {
+      document.body.innerHTML = top.file_text;
+    }
+  </script>
 </head>
-<body>
-<?file?>
+<body onload="form_load()">
 </body>
 </html>
 
