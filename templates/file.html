@@ -27,10 +27,23 @@
         "Слово: " + wordlist[index].word + "<br>\n" +
         "Словопозиции:";
       for (var i = 0; i < wordpositions.length; ++i) {
-        html += " " + wordpositions[i];
+        html +=
+            " <a href=\"#\" onclick=\"top.select_word_pos(" +
+            wordpositions[i] +
+            ")\">" + wordpositions[i] + "</a>";
       }
 
       top.frame_card.document.body.innerHTML = html;
+    }
+
+    var pos_old = 0;
+
+    function select_word_pos(pos) {
+      var word_old = top.frame_file.document.getElementById('word_' + pos_old);
+      var word = top.frame_file.document.getElementById('word_' + pos);
+      word_old.className = 'word';
+      word.className = 'word_selected';
+      pos_old = pos;
     }
   </script>
 </head>

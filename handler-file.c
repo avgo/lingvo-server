@@ -135,7 +135,9 @@ static int fill_wordlist(domutils_string *file_str,
 		domutils_string_init(&word);
 
 		domutils_string_append_printf(&word,
-				"<span id=\"word_%d\">%.*s</span>",
+				"<span id=\"word_%d\" class=\"word\" "
+				"onclick=\"top.select_word_pos(%d)\">%.*s</span>",
+				occ_node->begin,
 				occ_node->begin,
 				occ_node->end - occ_node->begin,
 				file_str->data + occ_node->begin);
