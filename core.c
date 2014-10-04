@@ -68,13 +68,24 @@ static int do_accept(int s)
 {
 	int acc = -1, ret = 1;
 	lingvo_server_request request;
+	socklen_t sock_len;
 
 
 	lingvo_server_request_init(&request);
 
-	acc = accept(s, NULL, NULL);
+	sock_len = sizeof(struct sockaddr_in);
+	acc = accept(s, (struct sockaddr*) &request.client_addr,
+			&sock_len);
 	if (acc == -1) {
 		printf("error: %s (%d).\n", strerror(errno), errno);
+		ret = -1; goto END;
+	}
+
+	if (getnameinfo((struct sockaddr*) &request.client_addr, sock_len,
+			request.host_buf, sizeof(request.host_buf),
+			request.port_buf, sizeof(request.port_buf),
+			NI_NUMERICHOST | NI_NUMERICSERV) == -1)
+	{
 		ret = -1; goto END;
 	}
 

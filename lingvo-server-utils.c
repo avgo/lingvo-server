@@ -131,6 +131,27 @@ int parameter_save(const char *p1, const char *p1_end,
 	return PAR_SAVE_MATCH;
 }
 
+int send_all(int sock, const char *buf, int buf_size)
+{
+	int bytes;
+
+
+	while (buf_size > 0) {
+		bytes = write(sock, buf, buf_size);
+
+		if (bytes == -1) {
+			if (errno == EAGAIN)
+				continue;
+			return -1;
+		}
+
+		buf += bytes;
+		buf_size -= bytes;
+	}
+
+	return 1;
+}
+
 int send_response(int sock, const char *str, ...)
 {
 	va_list ap;

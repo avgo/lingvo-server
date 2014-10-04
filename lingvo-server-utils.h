@@ -12,6 +12,7 @@
 int parameter_parse(const char *s1, const char *s1_end, const char *s2);
 int parameter_save(const char *str, const char *str_end,
 		const char *name, char **value, const char **next);
+int send_all(int sock, const char *buf, int buf_size);
 int send_response(int sock, const char *str, ...);
 
 

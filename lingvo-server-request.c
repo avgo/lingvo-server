@@ -150,7 +150,10 @@ static void lingvo_server_request_parse(lingvo_server_request *request)
 		return ;
 	}
 
-	printf("%s\n", request->query);
+	printf("%s from %s:%s\n",
+		request->query,
+		request->host_buf,
+		request->port_buf);
 
 	for ( ; *c1 != '\r' && *c1 != '\n'; ) {
 		for (c2 = c1; *c2 != ':'; ++c2) {

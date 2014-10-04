@@ -1,6 +1,8 @@
 #ifndef LINGVO_SERVER_REQUEST_H
 #define LINGVO_SERVER_REQUEST_H
 
+#include <netdb.h>
+#include <netinet/in.h>
 #include <domutils/string.h>
 
 #include "multipart-data.h"
@@ -32,6 +34,9 @@ struct lingvo_server_request_ {
 	char *query;
 	char *mp_data_boundary;
 	multipart_data mp_data;
+	struct sockaddr_in client_addr;
+	char host_buf[NI_MAXHOST];
+	char port_buf[NI_MAXSERV];
 
 	int shutdown;
 };

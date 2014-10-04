@@ -170,8 +170,7 @@ int doc_template_send(doc_template *dte, int sock, ...)
 
 	str[str_len] = '\0';
 
-	if (write(sock, str, str_len) != str_len) {
-		printf("write(): %s (%u)\n", strerror(errno), errno);
+	if (send_all(sock, str, str_len) == -1) {
 		ret = -1; goto END;
 	}
 
