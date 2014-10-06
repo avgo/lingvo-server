@@ -3,20 +3,66 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf8">
   <title>File Server</title>
   <style>
-  .not_alpha {
-    background-color: #ffaaaa;
-    color: #ffffff;
-    font-size: 10pt;
-    font-weight: bold;
-  }
+    table.nav_table {
+      height: 30px;
+      background-color: #FFCCCC;
+    }
+    td.nav_item {
+      width: 250px;
+      vertical-align: middle;
+      text-align: center;
+      font-size: 12pt;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    td.nav_item:hover {
+      color: #DD0000;
+      background-color: #FFAAAA;
+    }
+    a.nav_item {
+      color: #DD0000;
+    }
+    #wordlist {
+      overflow: scroll;
+    }
+    .not_alpha {
+      background-color: #ffaaaa;
+      color: #ffffff;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+    #file {
+      overflow: scroll;
+    }
+    .word {
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: normal;
+    }
+    .word_selected {
+      background-color: #ffaaaa;
+      color: #ffffff;
+      font-weight: bold;
+    }
   </style>
   <script>
     var wordlist = [
       <?wordlist?>
     ];
     var cur_word_index = 0;
-    var file_text = "<?file_text?>";
 
+    function form_load() {
+      var html = "<table>";
+      for (var i = 0; i < top.wordlist.length; ++i) {
+        html +=
+          "<tr>\n" +
+          "<td onclick=\"top.select_word(" + i + ")\">" + top.wordlist[i].word + "</td>\n" +
+          "<td>" + top.wordlist[i].count + "</td>\n" +
+          "</tr>\n";
+      }
+      html += "</table>";
+      document.getElementById("wordlist").innerHTML = html;
+    }
     function select_word(index) {
       var html = "";
       var wordpositions = wordlist[index].wordpositions;
@@ -33,7 +79,7 @@
             ")\">" + wordpositions[i] + "</a>";
       }
 
-      top.frame_card.document.body.innerHTML = html;
+      document.getElementById("wordlist").innerHTML = html;
     }
 
     var pos_old = 0;
@@ -47,16 +93,39 @@
     }
   </script>
 </head>
-<frameset rows="30,*">
-  <frame src="/file/<?filename?>/top" name="frame_top">
-  <frameset cols="300,*">
-    <frame src="/file/<?filename?>/wordlist" name="frame_wordlist" scrolling="yes">
-    <frameset rows="*,300">
-      <frame src="/file/<?filename?>/file" name="frame_file" scrolling="yes">
-      <frame src="/file/<?filename?>/card" name="frame_card">
-    </frameset>
-  </frameset>
-</frameset>
+<body onload="form_load()">
+  <!-- <table class="nav_table">
+    <tr>
+      <td class="nav_item">
+        <a href="/" class="nav_item" target="_top">home</a>
+      </td>
+      <td class="nav_item">
+        <a href="/test" class="nav_item" target="_top">test</a>
+      </td>
+      <td class="nav_item">
+        <a href="/shutdown" class="nav_item" target="_top">Завершить работу</a>
+      </td>
+    </tr>
+  </table> //-->
+  <table style="width: 100%; height: 100%;">
+    <tr>
+      <td rowspan="2">
+        <div id="wordlist">
+        </div>
+      </td>
+      <td>
+        <div id="file">
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 300px">
+        <div name="card">
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
 </html>
 
 <!-- vim: set expandtab ts=2 : //-->
