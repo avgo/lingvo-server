@@ -120,7 +120,6 @@ int doc_template_pat_subs_correspondence(doc_template *dte, va_list list)
 		if (is_absent == 1) {
 			printf("warning: Pattern '%s' is absent in the document.\n",
 					pat);
-			break;
 		}
 	}
 
