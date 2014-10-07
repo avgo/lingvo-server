@@ -32,6 +32,16 @@
       return top.frame_file.document.getElementById('word_' + wp);
     }
 
+    function get_group_id_by_pos(pos) {
+      for (var group_id = 0; group_id < wordgroups.length; ++group_id) {
+        var wp = wordgroups[group_id].wordpositions;
+        for (var i = 0; i < wp.length; ++i) {
+          if (wp[i] == pos)
+            return group_id;
+        }
+      }
+    }
+
     function select_all_words(group_id) {
       var wordpositions = wordgroups[group_id].wordpositions;
       for (var i = 0; i < wordpositions.length; ++i) {
@@ -45,6 +55,11 @@
       deselect_all_words();
       select_all_words(group_id);
       wordpositions_update(group_id);
+    }
+
+    function select_word(pos) {
+      var group_id = get_group_id_by_pos(pos);
+      select_group(group_id);
     }
 
     function wordpositions_update(group_id) {
