@@ -13,11 +13,11 @@
   <script>
     function form_load() {
       var html = "<table>";
-      for (var i = 0; i < top.wordlist.length; ++i) {
+      for (var i = 0; i < top.wordgroups.length; ++i) {
         html +=
           "<tr>\n" +
-          "<td onclick=\"top.select_word(" + i + ")\">" + top.wordlist[i].word + "</td>\n" +
-          "<td>" + top.wordlist[i].count + "</td>\n" +
+          "<td onclick=\"top.select_group(" + i + ")\">" + top.wordgroups[i].word + "</td>\n" +
+          "<td>" + top.wordgroups[i].count + "</td>\n" +
           "</tr>\n";
       }
       html += "</table>";

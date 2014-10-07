@@ -11,39 +11,57 @@
   }
   </style>
   <script>
-    var wordlist = [
+    var wordgroups = [
       <?wordlist?>
     ];
     var cur_word_index = 0;
     var file_text = "<?file_text?>";
+    var pos_old = 0;
+    var selected = [ ];
 
-    function select_word(index) {
+
+    function deselect_all_words() {
+      for (var i = 0; i < selected.length; ++i) {
+        var word = get_element_by_wp(selected[i]);
+        word.className = 'word';
+      }
+      selected = [ ];
+    }
+
+    function get_element_by_wp(wp) {
+      return top.frame_file.document.getElementById('word_' + wp);
+    }
+
+    function select_all_words(group_id) {
+      var wordpositions = wordgroups[group_id].wordpositions;
+      for (var i = 0; i < wordpositions.length; ++i) {
+        var word = get_element_by_wp(wordpositions[i]);
+        word.className = 'word_selected';
+        selected[selected.length] = wordpositions[i];
+      }
+    }
+
+    function select_group(group_id) {
+      deselect_all_words();
+      select_all_words(group_id);
+      wordpositions_update(group_id);
+    }
+
+    function wordpositions_update(group_id) {
       var html = "";
-      var wordpositions = wordlist[index].wordpositions;
+      var wordpositions = wordgroups[group_id].wordpositions;
 
-      cur_word_index = index;
+      cur_word_index = group_id;
 
       html =
-        "Слово: " + wordlist[index].word + "<br>\n" +
+        "Слово: " + wordgroups[group_id].word + "<br>\n" +
         "Словопозиции:";
       for (var i = 0; i < wordpositions.length; ++i) {
         html +=
-            " <a href=\"#\" onclick=\"top.select_word_pos(" +
-            wordpositions[i] +
-            ")\">" + wordpositions[i] + "</a>";
+            " <a href=\"#\">" + wordpositions[i] + "</a>";
       }
 
       top.frame_card.document.body.innerHTML = html;
-    }
-
-    var pos_old = 0;
-
-    function select_word_pos(pos) {
-      var word_old = top.frame_file.document.getElementById('word_' + pos_old);
-      var word = top.frame_file.document.getElementById('word_' + pos);
-      word_old.className = 'word';
-      word.className = 'word_selected';
-      pos_old = pos;
     }
   </script>
 </head>
