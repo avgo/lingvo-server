@@ -18,6 +18,7 @@
     var file_text = "<?file_text?>";
     var pos_old = 0;
     var selected = [ ];
+    var selected2 = [ ];
 
 
     function deselect_all_words() {
@@ -26,6 +27,11 @@
         word.className = 'word';
       }
       selected = [ ];
+      for (var i = 0; i < selected2.length; ++i) {
+        var word = get_element_by_wp(selected2[i]);
+        word.className = 'word';
+      }
+      selected2 = [ ];
     }
 
     function get_element_by_wp(wp) {
@@ -57,9 +63,28 @@
       wordpositions_update(group_id);
     }
 
-    function select_word(pos) {
+    function select_word(pos, is_scroll) {
       var group_id = get_group_id_by_pos(pos);
       select_group(group_id);
+      var word = get_element_by_wp(pos);
+      word.className = 'word_selected2';
+      selected2[selected2.length] = pos;
+
+      if (is_scroll) {
+        var scroll_x, scroll_y;
+        var offset_y;
+
+        offset_y = frame_file.window.innerHeight / 2;
+
+        scroll_x = 0;
+
+        if (word.offsetTop > offset_y)
+          scroll_y = word.offsetTop - offset_y;
+        else
+          scroll_y = 0;
+
+        frame_file.window.scrollTo(scroll_x, scroll_y);
+      }
     }
 
     function wordpositions_update(group_id) {
@@ -73,7 +98,8 @@
         "Словопозиции:";
       for (var i = 0; i < wordpositions.length; ++i) {
         html +=
-            " <a href=\"#\">" + wordpositions[i] + "</a>";
+            " <a href=\"#\" onclick=\"top.select_word(" +
+            wordpositions[i] + ", true)\">" + wordpositions[i] + "</a>";
       }
 
       top.frame_card.document.body.innerHTML = html;
