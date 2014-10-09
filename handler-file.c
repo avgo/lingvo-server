@@ -134,13 +134,20 @@ static int fill_wordlist(domutils_string *file_str,
 
 		domutils_string_init(&word);
 
-		domutils_string_append_printf(&word,
-				"<span id=\"word_%d\" class=\"word\" "
-				"onclick=\"top.select_word(%d, false)\">%.*s</span>",
-				occ_node->begin,
-				occ_node->begin,
-				occ_node->end - occ_node->begin,
-				file_str->data + occ_node->begin);
+		if (occ_node->wt == WORD_TYPE_SPACE) {
+			domutils_string_append_n(&word,
+					file_str->data + occ_node->begin,
+					occ_node->end - occ_node->begin);
+		}
+		else {
+			domutils_string_append_printf(&word,
+					"<span id=\"word_%d\" class=\"word\" "
+					"onclick=\"top.select_word(%d, false)\">%.*s</span>",
+					occ_node->begin,
+					occ_node->begin,
+					occ_node->end - occ_node->begin,
+					file_str->data + occ_node->begin);
+		}
 		escape_string_to_js(file_text, word.data, word.size - 1);
 
 		domutils_string_free(&word);
@@ -261,11 +268,11 @@ int handler_file(lingvo_server_request *request, int s)
 		}
 
 		fill_wordlist(&file_str, &str, &file_text);
-	
+
 		if (doc_template_open(&dt, "templates/file.html") == -1) {
 			ret = -1; goto END;
 		}
-	
+
 		if (doc_template_send(&dt, s,
 				"filename", opt.filename,
 				"file_text", file_text.data,
@@ -280,7 +287,7 @@ int handler_file(lingvo_server_request *request, int s)
 		if (doc_template_open(&dt, "templates/file.wordlist.html") == -1) {
 			ret = -1; goto END;
 		}
-	
+
 		if (doc_template_send(&dt, s,
 				NULL) == -1)
 		{
@@ -292,7 +299,7 @@ int handler_file(lingvo_server_request *request, int s)
 		if (doc_template_open(&dt, "templates/file.card.html") == -1) {
 			ret = -1; goto END;
 		}
-	
+
 		if (doc_template_send(&dt, s,
 				NULL) == -1)
 		{
@@ -304,7 +311,7 @@ int handler_file(lingvo_server_request *request, int s)
 		if (doc_template_open(&dt, "templates/file.file.html") == -1) {
 			ret = -1; goto END;
 		}
-	
+
 		if (doc_template_send(&dt, s,
 				NULL) == -1)
 		{
@@ -316,7 +323,7 @@ int handler_file(lingvo_server_request *request, int s)
 		if (doc_template_open(&dt, "templates/file.top.html") == -1) {
 			ret = -1; goto END;
 		}
-	
+
 		if (doc_template_send(&dt, s,
 				NULL) == -1)
 		{
