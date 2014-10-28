@@ -105,7 +105,8 @@ static int fill_wordlist(domutils_string *file_str,
 		escape_string_to_js(&esc_str2, esc_str.data, esc_str.size - 1);
 
 		domutils_string_append_printf(result_str,
-				"%s{ word: \"%s\", count: %d, wordpositions: [ ",
+				"%s{ word: \"%s\", count: %d, in_dict: false, "
+				"wordpositions: [ ",
 				next_line, esc_str2.data, count);
 
 		next_line = "";

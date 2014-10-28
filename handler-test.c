@@ -39,6 +39,10 @@ int handler_test(lingvo_server_request *request, int s)
 	domutils_string_init(&str);
 
 
+	printf("%.*s\n",
+		request->request_string_len,
+		request->request_string);
+
 	for (multipart_data_frame *f = request->mp_data.first;
 			f != NULL; f = f->next)
 	{
@@ -54,7 +58,10 @@ int handler_test(lingvo_server_request *request, int s)
 	else {
 		domutils_string_append(&str,
 			"Ни одного файла не пришло.\n"
-			"Отправьте файл с помощью формы.\n");
+			"Отправьте файл с помощью формы.<br>\n");
+		domutils_string_append_n(&str,
+			request->request_string,
+			request->request_string_len);
 	}
 
 	for (multipart_data_frame *f = request->mp_data.first;

@@ -9,15 +9,61 @@
     font-size: 10pt;
     font-weight: bold;
   }
+  table {
+    font-size: 10pt;
+  }
+  .in_dict {
+    background-color: #FFA0A0;
+    color: #5F0000;
+    cursor: pointer;
+  }
+  .not_in_dict {
+    background-color: #A0FFA0;
+    color: #005F00;
+    cursor: pointer;
+  }
   </style>
   <script>
+    function add_word(word_index) {
+      var req = new XMLHttpRequest();
+      if (!req) {
+        return ;
+      }
+      var word = top.wordgroups[word_index].word;
+      req.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+          alert("OK");
+        }
+      }
+      req.open("POST", "/addword", true);
+      req.send(word);
+    }
+    function del_word(word_index) {
+        alert("ok '" + top.wordgroups[word_index].word + "'");
+    }
     function form_load() {
       var html = "<table>";
       for (var i = 0; i < top.wordgroups.length; ++i) {
+        var add_to_dict;
+
+        if (top.wordgroups[i].in_dict) {
+          add_to_dict =
+            "<td class=\"in_dict\" onclick=\"del_word(" + i + ")\">" +
+            "del" +
+            "</td>";
+        }
+        else {
+          add_to_dict =
+            "<td class=\"not_in_dict\" onclick=\"add_word(" + i + ")\">" +
+            "add" +
+            "</td>";
+        }
+
         html +=
           "<tr>\n" +
           "<td onclick=\"top.select_group(" + i + ")\">" + top.wordgroups[i].word + "</td>\n" +
           "<td>" + top.wordgroups[i].count + "</td>\n" +
+          add_to_dict + "\n" +
           "</tr>\n";
       }
       html += "</table>";
