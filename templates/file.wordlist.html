@@ -24,21 +24,27 @@
   }
   </style>
   <script>
-    function add_word(word_index) {
+    function add_word(el, word_index) {
       var req = new XMLHttpRequest();
       if (!req) {
         return ;
       }
       var word = top.wordgroups[word_index].word;
       req.onreadystatechange = function () {
-        if (request.readyState == 4 && request.status == 200) {
-          alert("OK");
+        if (req.readyState == 4 && req.status == 200) {
+          var resp = req.responseText;
+          if (resp != "ok") {
+            return;
+          }
+          el.innerHTML = "del";
+          el.className = "in_dict";
+          top.wordgroups[word_index].in_dict = true;
         }
       }
       req.open("POST", "/dictionary_add", true);
       req.send(word);
     }
-    function del_word(word_index) {
+    function del_word(el, word_index) {
         alert("ok '" + top.wordgroups[word_index].word + "'");
     }
     function form_load() {
@@ -48,13 +54,13 @@
 
         if (top.wordgroups[i].in_dict) {
           add_to_dict =
-            "<td class=\"in_dict\" onclick=\"del_word(" + i + ")\">" +
+            "<td id=\"td" + i + "\" class=\"in_dict\" onclick=\"del_word(this, " + i + ")\">" +
             "del" +
             "</td>";
         }
         else {
           add_to_dict =
-            "<td class=\"not_in_dict\" onclick=\"add_word(" + i + ")\">" +
+            "<td id=\"td" + i + "\" class=\"not_in_dict\" onclick=\"add_word(this, " + i + ")\">" +
             "add" +
             "</td>";
         }

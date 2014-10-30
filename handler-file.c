@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include <lingvo/word_list_stw.h>
 #include <unicode/utf8.h>
+
+#include <lingvo/word_list_stw.h>
+#include <lingvo/dict_maria_db.h>
 
 #include "lingvo-server-request.h"
 #include "lingvo-server-utils.h"
@@ -68,10 +70,17 @@ static int fill_wordlist(domutils_string *file_str,
 {
 	int ret = 1;
 	lingvo_word_list_stw wl_stw;
+	lingvo_dictionary dict;
+	char *word = NULL;
 
 
 	lingvo_word_list_stw_init(&wl_stw);
+	lingvo_dict_maria_db_init(&dict);
 
+
+	if (lingvo_dictionary_create(&dict) == -1) {
+		ret = -1; goto END;
+	}
 
 	if (lingvo_word_list_stw_create(&wl_stw, file_str->data) == -1) {
 		ret = -1; goto END;
@@ -90,7 +99,18 @@ static int fill_wordlist(domutils_string *file_str,
 		domutils_string_init(&esc_str2);
 
 
+		word = strndup(
+			file_str->data + node->occ.first->begin,
+			(int) (node->occ.first->end - node->occ.first->begin));
+
 		int count = 0;
+		int in_dict;
+
+		in_dict = lingvo_dictionary_get_word(&dict, word);
+		if (in_dict == -1) {
+			printf("can't obtain word!\n");
+			// ret == -1; goto END;
+		}
 
 		for (lingvo_word_list_stw_occ_node *occ_node = node->occ.first;
 					occ_node != NULL;
@@ -105,9 +125,10 @@ static int fill_wordlist(domutils_string *file_str,
 		escape_string_to_js(&esc_str2, esc_str.data, esc_str.size - 1);
 
 		domutils_string_append_printf(result_str,
-				"%s{ word: \"%s\", count: %d, in_dict: false, "
+				"%s{ word: \"%s\", count: %d, in_dict: %s, "
 				"wordpositions: [ ",
-				next_line, esc_str2.data, count);
+				next_line, esc_str2.data, count,
+				in_dict == 1 ? "true" : "false");
 
 		next_line = "";
 
@@ -125,6 +146,11 @@ static int fill_wordlist(domutils_string *file_str,
 
 		domutils_string_free(&esc_str);
 		domutils_string_free(&esc_str2);
+
+	END0:	if (word != NULL) {
+			free(word);
+			word = NULL;
+		}
 	}
 
 	for (lingvo_word_list_stw_occ_node *occ_node = wl_stw.occ.first;
@@ -155,6 +181,9 @@ static int fill_wordlist(domutils_string *file_str,
 	}
 
 END:	lingvo_word_list_stw_free(&wl_stw);
+	lingvo_dictionary_close(&dict);
+	if (word != NULL)
+		free(word);
 
 	return ret;
 }
