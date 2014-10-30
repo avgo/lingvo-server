@@ -57,6 +57,12 @@ static const char* get_boundary(const char *str, int str_len, const char *bounda
 	return NULL;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Returns pointer to position after '\r\n\r\n' or '\n\n'.
+ * '\r\n\r\n'  '\n\n'
+ *          ^       ^
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 static const char* get_terminator(const char *str, int str_len)
 {
 	const char *str_end = str + str_len - 3;
@@ -91,6 +97,7 @@ void lingvo_server_request_init(lingvo_server_request *request)
 {
 	request->request_string = NULL;
 	request->query = NULL;
+	request->terminator = NULL;
 	request->content_length = 0;
 	request->shutdown = 0;
 	request->mp_data_boundary = NULL;
@@ -331,7 +338,6 @@ static int lingvo_server_request_post_data(lingvo_server_request *request)
 
 int lingvo_server_request_read(lingvo_server_request *request, int s)
 {
-	const char *terminator;
 	char buf[50];
 	int bytes_read, ret = 1;
 	char *buffer = NULL;
@@ -339,7 +345,7 @@ int lingvo_server_request_read(lingvo_server_request *request, int s)
 	int buffer_size_alloc = 0;
 
 
-	for (terminator = NULL; terminator == NULL; ) {
+	for (request->terminator = NULL; request->terminator == NULL; ) {
 		bytes_read = read(s, buf, sizeof(buf));
 
 		if (bytes_read == -1) {
@@ -370,11 +376,11 @@ int lingvo_server_request_read(lingvo_server_request *request, int s)
 		memcpy(new_data, buf, bytes_read);
 
 		if (buffer_size > 3)
-			terminator = get_terminator(
+			request->terminator = get_terminator(
 					new_data - 3,
 					bytes_read + 3);
 		else
-			terminator = get_terminator(buffer, buffer_size_new);
+			request->terminator = get_terminator(buffer, buffer_size_new);
 
 		buffer_size = buffer_size_new;
 	}
@@ -385,7 +391,7 @@ int lingvo_server_request_read(lingvo_server_request *request, int s)
 	lingvo_server_request_parse(request);
 
 	if (request->method.id == LINGVO_SERVER_POST) {
-		int bytes_post_loaded = buffer + buffer_size - terminator;
+		int bytes_post_loaded = buffer + buffer_size - request->terminator;
 		if (bytes_post_loaded >= request->content_length)
 			return ret;
 		int bytes_post_remain = request->content_length - bytes_post_loaded;

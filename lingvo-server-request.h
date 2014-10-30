@@ -27,11 +27,20 @@ struct lingvo_server_method_ {
 typedef struct lingvo_server_method_ lingvo_server_method;
 
 struct lingvo_server_request_ {
+	/* Full HTTP Header and it's length */
 	char *request_string;
 	int request_string_len;
+
 	lingvo_server_method method;
 	int content_length;
+
+	/* Query string in first line of header
+	 * For example: "GET /index.html HTTP"
+	 * query: "/index.html"               */
 	char *query;
+
+	const char *terminator;
+
 	char *mp_data_boundary;
 	multipart_data mp_data;
 	struct sockaddr_in client_addr;
