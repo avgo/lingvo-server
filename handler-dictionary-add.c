@@ -16,18 +16,34 @@ int handler_dictionary_add(lingvo_server_request *request, int s)
 	lingvo_dictionary dict;
 	char *word = NULL;
 	char *message = NULL;
+	char *unescaped = NULL;
 
 
 	lingvo_dict_maria_db_init(&dict);
 
 
-	lingvo_dictionary_create(&dict);
 	word = strndup(request->terminator, request->content_length);
 	if (word == NULL) {
 		ret = -1; goto END;
 	}
+	printf("word: '%s'\n", word);
+	if (unescape_string(word, NULL, &unescaped) == 1) {
+		printf("unescaped: '%s'\n", unescaped);
+	}
+	else {
+		printf("error: unescape_string().\n");
+		goto END;
+	}
 
-	result = lingvo_dictionary_add_word(&dict, word);
+	if (unescaped == NULL) {
+		printf("error: unescaped == NULL.\n\n");
+		goto END;
+	}
+
+	putchar('\n');
+
+	lingvo_dictionary_create(&dict);
+	result = lingvo_dictionary_add_word(&dict, unescaped);
 	if (result > -1) {
 		message = "ok";
 	}
@@ -41,6 +57,8 @@ int handler_dictionary_add(lingvo_server_request *request, int s)
 
 END:	if (word != NULL)
 		free(word);
+	if (unescaped != NULL)
+		free(unescaped);
 	lingvo_dictionary_close(&dict);
 
 	return ret;

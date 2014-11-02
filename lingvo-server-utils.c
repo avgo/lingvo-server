@@ -180,3 +180,86 @@ END:	if (data != NULL)
 		free(data);
 	return ret;
 }
+
+int unescape_string(const char *s, const char *s_end, char **unescaped_string)
+{
+	int ret = 1;
+	const char *p1 = s;
+	char *result = NULL, *r1;
+	int count = 0;
+
+
+	if (s_end == NULL) {
+		for (s_end = s; *s_end != '\0'; ++s_end)
+			;
+	}
+
+#define is_x_digit(c) \
+	(('0' <= c && c <= '9') || \
+	('a' <= c && c <= 'f') || \
+	('A' <= c && c <= 'F'))
+
+	for (p1 = s; p1 != s_end; ++count) {
+		if (*p1 == '%') {
+			if (s_end - p1 < 3) {
+				ret = 0; goto END;
+			}
+			char c1 = p1[1], c2 = p1[2];
+			if (!is_x_digit(c1) || !is_x_digit(c2)) {
+				ret = 0; goto END;
+			}
+			p1 += 3;
+		}
+		else
+			++p1;
+	}
+
+	result = malloc(count+1);
+	if (result == NULL) {
+		ret = -1; goto END;
+	}
+	for (p1 = s, r1 = result; p1 != s_end; ++r1) {
+		if (*p1 == '%') {
+			char c1 = p1[1], c2 = p1[2];
+			if ('0' <= c1 && c1 <= '9') {
+				*r1 = (c1 - '0') << 4;
+			}
+			else
+			if ('A' <= c1 && c1 <= 'F') {
+				*r1 = (c1 - 'A' + 0xA) << 4;
+			}
+			else
+			if ('a' <= c1 && c1 <= 'f') {
+				*r1 = (c1 - 'a' + 0xA) << 4;
+			}
+			if ('0' <= c2 && c2 <= '9') {
+				*r1 |= c2 - '0';
+			}
+			else
+			if ('A' <= c2 && c2 <= 'F') {
+				*r1 |= c2 - 'A' + 0xA;
+			}
+			else
+			if ('a' <= c2 && c2 <= 'f') {
+				*r1 |= c2 - 'a' + 0xA;
+			}
+			p1 += 3;
+		}
+		else {
+			*r1 = *p1;
+			++p1;
+		}
+	}
+
+	*r1 = '\0';
+
+END:	if (ret > 0)
+		*unescaped_string = result;
+	else {
+		if (result != NULL)
+			free(result);
+		*unescaped_string = NULL;
+	}
+
+	return ret;
+}

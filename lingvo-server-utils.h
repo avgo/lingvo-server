@@ -14,6 +14,7 @@ int parameter_save(const char *str, const char *str_end,
 		const char *name, char **value, const char **next);
 int send_all(int sock, const char *buf, int buf_size);
 int send_response(int sock, const char *str, ...);
+int unescape_string(const char *s, const char *s_end, char **unescaped_string);
 
 
 
