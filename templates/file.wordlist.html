@@ -42,7 +42,7 @@
         }
       }
       req.open("POST", "/dictionary_add", true);
-      req.send(encodeURIComponent(word));
+      req.send("action=add&word=" + encodeURIComponent(word));
     }
     function del_word(el, word_index) {
         alert("ok '" + top.wordgroups[word_index].word + "'");

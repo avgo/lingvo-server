@@ -189,7 +189,7 @@ int unescape_string(const char *s, const char *s_end, char **unescaped_string)
 	int count = 0;
 
 
-	if (s_end == NULL) {
+	if (s_end == NULL && s != NULL) {
 		for (s_end = s; *s_end != '\0'; ++s_end)
 			;
 	}
