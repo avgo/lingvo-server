@@ -23,12 +23,14 @@ typedef struct dict_action_ dict_action;
 
 
 int action_add(dict_action *da);
+int action_delete(dict_action *da);
 
 
 
 
 query_action actions[] = {
-	{ "add", action_add }
+	{ "add",    action_add },
+	{ "delete", action_delete }
 };
 
 int actions_count = sizeof(actions) / sizeof(*actions);
@@ -66,6 +68,35 @@ int action_add(dict_action *da)
 END:	return ret;
 }
 
+int action_delete(dict_action *da)
+{
+	int ret = QUERY_ACTION_OK;
+	const char *word;
+	const char *message = "ok";
+	int result;
+
+
+	word = query_string_get(da->qs, "word");
+
+	if (word == NULL) {
+		printf("error: empty 'word' parameter.\n");
+		message = "fail";
+	}
+	else {
+		printf("delete word: '%s'\n", word);
+
+		result = lingvo_dictionary_delete_word(da->dict, word);
+		if (result == -1) {
+			ret = QUERY_ACTION_SYSERROR; goto END;
+		}
+	}
+
+	if (send_response(da->s, message) == -1) {
+		ret = QUERY_ACTION_SYSERROR; goto END;
+	}
+
+END:	return ret;
+}
 
 int handler_dictionary_add(lingvo_server_request *request, int s)
 {

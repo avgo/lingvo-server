@@ -25,27 +25,50 @@
   </style>
   <script>
     function add_word(el, word_index) {
+      var word = top.wordgroups[word_index].word;
+      dict_ajax(
+        "action=add&word=" + encodeURIComponent(word),
+        add_word_proc,
+        { "el": el, "word_index": word_index });
+    }
+    function add_word_proc(obj) {
+      obj.el.innerHTML = "del";
+      obj.el.className = "in_dict";
+      obj.el.setAttribute("onclick",
+        "del_word(this, " + obj.word_index + ")");
+      top.wordgroups[obj.word_index].in_dict = true;
+    }
+    function del_word(el, word_index) {
+      var word = top.wordgroups[word_index].word;
+      dict_ajax(
+        "action=delete&word=" + encodeURIComponent(word),
+        del_word_proc,
+        { "el": el, "word_index": word_index });
+    }
+    function del_word_proc(obj) {
+      obj.el.innerHTML = "add";
+      obj.el.className = "not_in_dict";
+      obj.el.setAttribute("onclick",
+        "add_word(this, " + obj.word_index + ")");
+      top.wordgroups[obj.word_index].in_dict = false;
+    }
+    function dict_ajax(query, proc, obj) {
       var req = new XMLHttpRequest();
       if (!req) {
         return ;
       }
-      var word = top.wordgroups[word_index].word;
       req.onreadystatechange = function () {
         if (req.readyState == 4 && req.status == 200) {
           var resp = req.responseText;
           if (resp != "ok") {
+            alert("fail");
             return;
           }
-          el.innerHTML = "del";
-          el.className = "in_dict";
-          top.wordgroups[word_index].in_dict = true;
+          proc(obj);
         }
       }
       req.open("POST", "/dictionary_add", true);
-      req.send("action=add&word=" + encodeURIComponent(word));
-    }
-    function del_word(el, word_index) {
-        alert("ok '" + top.wordgroups[word_index].word + "'");
+      req.send(query);
     }
     function form_load() {
       var html = "<table>";
