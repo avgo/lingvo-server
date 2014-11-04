@@ -8,6 +8,38 @@
 
 
 
+typedef int (*query_action_proc)(void*);
+
+
+
+
+int query_string_add(query_string *qs,
+		const char *p1, const char *p2,
+		const char *p3, const char *p4);
+
+
+
+
+int query_action_do(query_string *qs, query_action *actions, int actions_count, const char *name, void *args)
+{
+	query_action *actions_end = actions + actions_count;
+	const char *action;
+
+
+	action = query_string_get(qs, name);
+	if (action == NULL)
+		return QUERY_ACTION_NO_ATTR;
+
+	for (query_action *act = actions;
+			act != actions_end; ++act)
+	{
+		if (strcmp(act->name, action) == 0)
+			return ((query_action_proc) act->proc)(args);
+	}
+
+	return QUERY_ACTION_NO_ACTION;
+}
+
 int query_string_add(query_string *qs,
 		const char *p1, const char *p2,
 		const char *p3, const char *p4)

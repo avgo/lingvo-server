@@ -39,7 +39,7 @@ int handler_test(lingvo_server_request *request, int s)
 	domutils_string_init(&str);
 
 
-	printf("%.*s\n",
+	printf("%.*s",
 		request->request_string_len,
 		request->request_string);
 

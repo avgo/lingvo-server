@@ -99,6 +99,8 @@ static int do_accept(int s)
 		ret = -1; goto END;
 	}
 
+	putchar('\n');
+
 	if (request.shutdown == 1)
 		ret = 0;
 

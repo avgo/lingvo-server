@@ -287,7 +287,7 @@ int handler_file(lingvo_server_request *request, int s)
 	handler_file_options_get(&opt, request->query);
 
 	printf(	"file: '%s'\n"
-		"action: '%s'\n\n",
+		"action: '%s'\n",
 		opt.filename, opt.action);
 
 	if (opt.action == NULL) {
