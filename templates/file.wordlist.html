@@ -75,19 +75,22 @@
       var html = "<table>";
       for (var i = 0; i < top.wordgroups.length; ++i) {
         var add_to_dict;
+        var class_name = "", text = "";
 
         if (top.wordgroups[i].in_dict) {
-          add_to_dict =
-            "<td id=\"td" + i + "\" class=\"in_dict\" onclick=\"add_del_word(this, " + i + ")\">" +
-            "del" +
-            "</td>";
+          class_name = "in_dict";
+          text = "del";
         }
         else {
-          add_to_dict =
-            "<td id=\"td" + i + "\" class=\"not_in_dict\" onclick=\"add_del_word(this, " + i + ")\">" +
-            "add" +
-            "</td>";
+          class_name = "not_in_dict";
+          text = "add";
         }
+
+        add_to_dict =
+          "<td id=\"td" + i + "\" class=\"" + class_name +
+          "\" onclick=\"add_del_word(this, " + i + ")\">" +
+          text +
+          "</td>";
 
         html +=
           "<tr>\n" +
