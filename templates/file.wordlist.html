@@ -22,6 +22,18 @@
     color: #005F00;
     cursor: pointer;
   }
+  .group_not_selected {
+    background-color: #FFFFFF;
+    cursor: pointer;
+  }
+  .group_not_selected:hover {
+    background-color: #DFFFDF;
+    cursor: pointer;
+  }
+  .group_selected {
+    background-color: #CCFFCC;
+    cursor: pointer;
+  }
   </style>
   <script>
     function add_del_word(el, word_index) {
@@ -93,8 +105,8 @@
           "</td>";
 
         html +=
-          "<tr>\n" +
-          "<td onclick=\"top.select_group(" + i + ")\">" + top.wordgroups[i].word + "</td>\n" +
+          "<tr id=\"tr" + i + "\" class=\"group_not_selected\">\n" +
+          "<td onclick=\"top.select_group(" + i + ", false)\">" + top.wordgroups[i].word + "</td>\n" +
           "<td>" + top.wordgroups[i].count + "</td>\n" +
           add_to_dict + "\n" +
           "</tr>\n";
