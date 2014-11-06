@@ -123,7 +123,9 @@
     function wordpositions_update(group_id) {
       var html = "";
       var wordpositions = wordgroups[group_id].wordpositions;
+      var card;
 
+      card = frame_card.document.getElementById("card");
       cur_word_index = group_id;
 
       html =
@@ -135,7 +137,7 @@
             wordpositions[i] + ", true)\">" + wordpositions[i] + "</a>";
       }
 
-      top.frame_card.document.body.innerHTML = html;
+      card.innerHTML = html;
     }
   </script>
 </head>
@@ -143,7 +145,7 @@
   <frame src="/file/<?filename?>/top" name="frame_top">
   <frameset cols="300,*">
     <frame src="/file/<?filename?>/wordlist" name="frame_wordlist" scrolling="yes">
-    <frameset rows="*,300">
+    <frameset rows="*,350">
       <frame src="/file/<?filename?>/file" name="frame_file" scrolling="yes">
       <frame src="/file/<?filename?>/card" name="frame_card">
     </frameset>

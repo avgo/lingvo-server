@@ -9,10 +9,73 @@
     font-size: 10pt;
     font-weight: bold;
   }
+  .btn_submit {
+    background-color: #ffbbbb;
+    color: #bb1111;
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    height: 30pt;
+    cursor: pointer;
+  }
+  .btn_submit:hover {
+    text-decoration: underline;
+  }
   </style>
 </head>
 <body>
-CARD!
+  <div id="card">
+    CARD!
+  </div>
+  <table border="1">
+    <tr>
+      <td>Падеж</td>
+      <td>Вопрос</td>
+      <td>Единственное</td>
+      <td>Множественное</td>
+    </tr>
+    <tr>
+      <td>Именительный</td>
+      <td>Кто? Что?</td>
+      <td><input type="text" name="case1e"</td>
+      <td><input type="text" name="case1m"</td>
+    </tr>
+    <tr>
+      <td>Родительный</td>
+      <td>Чего? Какой?</td>
+      <td><input type="text" name="case2e"</td>
+      <td><input type="text" name="case2m"></td>
+    </tr>
+    <tr>
+      <td>Дательный</td>
+      <td>Кому? Чему?</td>
+      <td><input type="text" name="case3e"</td>
+      <td><input type="text" name="case3m"></td>
+    </tr>
+    <tr>
+      <td>Винительный</td>
+      <td>Кого? Чего?</td>
+      <td><input type="text" name="case4e"</td>
+      <td><input type="text" name="case4m"></td>
+    </tr>
+    <tr>
+      <td>Творительный</td>
+      <td>Кем? Чем?</td>
+      <td><input type="text" name="case5e"</td>
+      <td><input type="text" name="case5m"></td>
+    </tr>
+    <tr>
+      <td>Предложный</td>
+      <td>О ком? О чём?</td>
+      <td><input type="text" name="case6e"></td>
+      <td><input type="text" name="case6m"></td>
+    </tr>
+    <tr>
+      <td class="btn_submit" colspan="4">
+        Обновить в словаре
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 
