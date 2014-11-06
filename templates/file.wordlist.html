@@ -24,33 +24,34 @@
   }
   </style>
   <script>
-    function add_word(el, word_index) {
+    function add_del_word(el, word_index) {
+      var action = "";
+
+      if (top.wordgroups[word_index].in_dict) {
+        action = "delete";
+      }
+      else {
+        action = "add";
+      }
+
       var word = top.wordgroups[word_index].word;
+
       dict_ajax(
-        "action=add&word=" + encodeURIComponent(word),
-        add_word_proc,
+        "action=" + action + "&word=" + encodeURIComponent(word),
+        add_del_word_proc,
         { "el": el, "word_index": word_index });
     }
-    function add_word_proc(obj) {
-      obj.el.innerHTML = "del";
-      obj.el.className = "in_dict";
-      obj.el.setAttribute("onclick",
-        "del_word(this, " + obj.word_index + ")");
-      top.wordgroups[obj.word_index].in_dict = true;
-    }
-    function del_word(el, word_index) {
-      var word = top.wordgroups[word_index].word;
-      dict_ajax(
-        "action=delete&word=" + encodeURIComponent(word),
-        del_word_proc,
-        { "el": el, "word_index": word_index });
-    }
-    function del_word_proc(obj) {
-      obj.el.innerHTML = "add";
-      obj.el.className = "not_in_dict";
-      obj.el.setAttribute("onclick",
-        "add_word(this, " + obj.word_index + ")");
-      top.wordgroups[obj.word_index].in_dict = false;
+    function add_del_word_proc(obj) {
+      if (top.wordgroups[obj.word_index].in_dict) {
+        obj.el.innerHTML = "add";
+        obj.el.className = "not_in_dict";
+        top.wordgroups[obj.word_index].in_dict = false;
+      }
+      else {
+        obj.el.innerHTML = "del";
+        obj.el.className = "in_dict";
+        top.wordgroups[obj.word_index].in_dict = true;
+      }
     }
     function dict_ajax(query, proc, obj) {
       var req = new XMLHttpRequest();
@@ -77,13 +78,13 @@
 
         if (top.wordgroups[i].in_dict) {
           add_to_dict =
-            "<td id=\"td" + i + "\" class=\"in_dict\" onclick=\"del_word(this, " + i + ")\">" +
+            "<td id=\"td" + i + "\" class=\"in_dict\" onclick=\"add_del_word(this, " + i + ")\">" +
             "del" +
             "</td>";
         }
         else {
           add_to_dict =
-            "<td id=\"td" + i + "\" class=\"not_in_dict\" onclick=\"add_word(this, " + i + ")\">" +
+            "<td id=\"td" + i + "\" class=\"not_in_dict\" onclick=\"add_del_word(this, " + i + ")\">" +
             "add" +
             "</td>";
         }
