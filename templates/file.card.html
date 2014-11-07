@@ -3,6 +3,26 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf8">
   <title>File card</title>
   <style>
+  .tab_control_item_toggle_off {
+    background-color: #ffdddd;
+    color: #bb1111;
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5;
+  }
+  .tab_control_item_toggle_on {
+    background-color: #ff5555;
+    color: #441111;
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5;
+  }
   .not_alpha {
     background-color: #ffaaaa;
     color: #ffffff;
@@ -22,12 +42,75 @@
     text-decoration: underline;
   }
   </style>
+  <script>
+    var tab_control1 = {
+      doc: document,
+      id: "tab_control1",
+      selected_index: -1,
+      elements: [
+        { caption: "Существительное", arg: "table_su"   },
+        { caption: "Прилагательное",  arg: "table_pri"  },
+        { caption: "Глагол",          arg: "table_gl"   },
+        { caption: "Предлог",         arg: "table_pred" }
+      ],
+      on_select_change: on_select_change
+    };
+    function on_load() {
+      tab_control_create(tab_control1);
+    }
+    function on_select_change(obj, index) {
+      var disp = (obj.selected_index == index) ? "" : "none";
+      var arg = obj.elements[index].arg;
+      var el = obj.doc.getElementById(arg);
+
+      if (el) {
+        el.style.display = disp;
+      }
+    }
+    function tab_control_create(obj) {
+      var tc = obj.doc.getElementById(obj.id);
+      var html = "";
+
+      html =
+        "<table>" +
+        "<tr>";
+      for (var i = 0; i < obj.elements.length; ++i) {
+        html +=
+          "<td class=\"tab_control_item_toggle_off\" " +
+          "onclick=\"tab_control_item_click(" + obj.id + ", " + i + ")\">" +
+          obj.elements[i].caption + "</td>";
+        obj.on_select_change(obj, i);
+      }
+      html +=
+        "</tr>" +
+        "</table>";
+
+      tc.innerHTML = html;
+    }
+    function tab_control_item_click(obj, selected_index) {
+      var tc = obj.doc.getElementById(obj.id);
+      var tbl = tc.childNodes[0];
+      var cells = tbl.childNodes[0].childNodes[0].childNodes;
+      var text = "";
+
+      obj.selected_index = selected_index;
+
+      for (var i = 0; i < cells.length; ++i) {
+        if (i == selected_index) {
+          cells[i].className = "tab_control_item_toggle_on";
+        }
+        else {
+          cells[i].className = "tab_control_item_toggle_off";
+        }
+        obj.on_select_change(obj, i);
+      }
+    }
+  </script>
 </head>
-<body>
-  <div id="card">
-    CARD!
-  </div>
-  <table border="1">
+<body onload="on_load()">
+  <div id="card"></div>
+  <div id="tab_control1"></div>
+  <table id="table_su" border="1">
     <tr>
       <td>Падеж</td>
       <td>Вопрос</td>
@@ -74,6 +157,16 @@
       <td class="btn_submit" colspan="4">
         Обновить в словаре
       </td>
+    </tr>
+  </table>
+  <table id="table_pri" border="1">
+    <tr>
+      <td>11</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>22</td>
     </tr>
   </table>
 </body>
