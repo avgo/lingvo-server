@@ -105,8 +105,9 @@ static int fill_wordlist(domutils_string *file_str,
 
 		int count = 0;
 		int in_dict;
+		unsigned int word_type = 1;
 
-		in_dict = lingvo_dictionary_get_word(&dict, word);
+		in_dict = lingvo_dictionary_get_word(&dict, word, &word_type);
 		if (in_dict == -1) {
 			printf("can't obtain word!\n");
 			// ret == -1; goto END;
@@ -126,9 +127,9 @@ static int fill_wordlist(domutils_string *file_str,
 
 		domutils_string_append_printf(result_str,
 				"%s{ word: \"%s\", count: %d, in_dict: %s, "
-				"wordpositions: [ ",
+				"type: %u, wordpositions: [ ",
 				next_line, esc_str2.data, count,
-				in_dict == 1 ? "true" : "false");
+				in_dict == 1 ? "true" : "false", word_type);
 
 		next_line = "";
 
