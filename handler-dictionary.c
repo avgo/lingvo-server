@@ -98,7 +98,7 @@ int action_delete(dict_action *da)
 END:	return ret;
 }
 
-int handler_dictionary_add(lingvo_server_request *request, int s)
+int handler_dictionary(lingvo_server_request *request, int s)
 {
 	int ret = 1;
 	query_string qs;

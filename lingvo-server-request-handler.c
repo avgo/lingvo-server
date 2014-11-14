@@ -15,7 +15,7 @@ typedef struct req_handler_ req_handler;
 
 
 int handler_default(lingvo_server_request *request, int s);
-int handler_dictionary_add(lingvo_server_request *request, int s);
+int handler_dictionary(lingvo_server_request *request, int s);
 int handler_err(lingvo_server_request *request, int s);
 int handler_file(lingvo_server_request *request, int s);
 int handler_shutdown(lingvo_server_request *request, int s);
@@ -26,7 +26,7 @@ int handler_test(lingvo_server_request *request, int s);
 
 static req_handler handlers[] = {
 	{ "",                handler_default        },
-	{ "dictionary_add",  handler_dictionary_add },
+	{ "dictionary",      handler_dictionary     },
 	{ "file",            handler_file           },
 	{ "shutdown",        handler_shutdown       },
 	{ "test",            handler_test           },
