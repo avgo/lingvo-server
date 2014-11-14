@@ -88,6 +88,10 @@
       for (var i = 0; i < top.wordgroups.length; ++i) {
         var add_to_dict;
         var class_name = "", text = "";
+        var type_code = top.wordgroups[i].type;
+        var name_short;
+
+        name_short = (type_code == -1) ? "" : top.wordtypes[type_code].name_short;
 
         if (top.wordgroups[i].in_dict) {
           class_name = "in_dict";
@@ -108,6 +112,7 @@
           "<tr id=\"tr" + i + "\" class=\"group_not_selected\">\n" +
           "<td onclick=\"top.select_group(" + i + ", false)\">" + top.wordgroups[i].word + "</td>\n" +
           "<td>" + top.wordgroups[i].count + "</td>\n" +
+          "<td>" + name_short + "</td>\n" +
           add_to_dict + "\n" +
           "</tr>\n";
       }

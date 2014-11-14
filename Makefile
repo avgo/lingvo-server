@@ -17,6 +17,7 @@ lingvo_server_OBJECTS = \
 	handler-file.o \
 	handler-shutdown.o \
 	handler-test.o \
+	handler-wordtypes.o \
 	lingvo-server.o \
 	lingvo-server-request.o \
 	lingvo-server-request-handler.o \

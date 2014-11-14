@@ -113,6 +113,9 @@ static int fill_wordlist(domutils_string *file_str,
 			// ret == -1; goto END;
 		}
 
+		dictionary_word_type *wt = lingvo_dictionary_get_word_type(
+				&dict, word_type);
+
 		for (lingvo_word_list_stw_occ_node *occ_node = node->occ.first;
 					occ_node != NULL;
 					occ_node = occ_node->next)
@@ -127,9 +130,10 @@ static int fill_wordlist(domutils_string *file_str,
 
 		domutils_string_append_printf(result_str,
 				"%s{ word: \"%s\", count: %d, in_dict: %s, "
-				"type: %u, wordpositions: [ ",
+				"type: %d, wordpositions: [ ",
 				next_line, esc_str2.data, count,
-				in_dict == 1 ? "true" : "false", word_type);
+				in_dict == 1 ? "true" : "false",
+				wt == NULL ? -1 : wt - dict.types);
 
 		next_line = "";
 

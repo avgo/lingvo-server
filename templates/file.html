@@ -10,6 +10,7 @@
     font-weight: bold;
   }
   </style>
+  <script type="text/javascript" charset="utf-8" src="/wordtypes.js"></script>
   <script>
     var wordgroups = [
       <?wordlist?>
@@ -77,6 +78,10 @@
       tr = frame_wordlist.document.getElementById('tr' + group_id);
       tr.className = 'group_selected';
       selected_gr[selected_gr.length] = group_id;
+
+      frame_card.tab_control_set_selected(
+          frame_card.tab_control1,
+          wordgroups[group_id].type);
 
       if (is_scroll) {
         var scroll_x, scroll_y;

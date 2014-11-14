@@ -47,15 +47,17 @@
       doc: document,
       id: "tab_control1",
       selected_index: -1,
-      elements: [
-        { caption: "Существительное", arg: "table_su"   },
-        { caption: "Прилагательное",  arg: "table_pri"  },
-        { caption: "Глагол",          arg: "table_gl"   },
-        { caption: "Предлог",         arg: "table_pred" }
-      ],
+      elements: [ ],
       on_select_change: on_select_change
     };
     function on_load() {
+      tab_control1.elements = [ ];
+      for (var i = 0; i < top.wordtypes.length; ++i) {
+        tab_control1.elements[i] = {
+          caption: top.wordtypes[i].name,
+          arg: "table_" + top.wordtypes[i].name_lat
+        }
+      }
       tab_control_create(tab_control1);
     }
     function on_select_change(obj, index) {
@@ -88,6 +90,9 @@
       tc.innerHTML = html;
     }
     function tab_control_item_click(obj, selected_index) {
+      tab_control_set_selected(obj, selected_index);
+    }
+    function tab_control_set_selected(obj, selected_index) {
       var tc = obj.doc.getElementById(obj.id);
       var tbl = tc.childNodes[0];
       var cells = tbl.childNodes[0].childNodes[0].childNodes;

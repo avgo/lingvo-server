@@ -4,9 +4,16 @@
 
 
 
+#define CONTENT_TYPE_TEXT_HTML                   "text/html"
+#define CONTENT_TYPE_APPLICATION_X_JAVASCRIPT    "application/x-javascript"
+
+
+
+
 struct req_handler_ {
-	char *command;
+	const char *command;
 	int (*proc)(lingvo_server_request*, int);
+	const char *content_type;
 };
 
 typedef struct req_handler_ req_handler;
@@ -20,16 +27,18 @@ int handler_err(lingvo_server_request *request, int s);
 int handler_file(lingvo_server_request *request, int s);
 int handler_shutdown(lingvo_server_request *request, int s);
 int handler_test(lingvo_server_request *request, int s);
+int handler_wordtypes(lingvo_server_request *request, int s);
 
 
 
 
 static req_handler handlers[] = {
-	{ "",                handler_default        },
-	{ "dictionary",      handler_dictionary     },
-	{ "file",            handler_file           },
-	{ "shutdown",        handler_shutdown       },
-	{ "test",            handler_test           },
+	{ "",                handler_default,       CONTENT_TYPE_TEXT_HTML                },
+	{ "dictionary",      handler_dictionary,    CONTENT_TYPE_TEXT_HTML                },
+	{ "file",            handler_file,          CONTENT_TYPE_TEXT_HTML                },
+	{ "shutdown",        handler_shutdown,      CONTENT_TYPE_TEXT_HTML                },
+	{ "test",            handler_test,          CONTENT_TYPE_TEXT_HTML                },
+	{ "wordtypes.js",    handler_wordtypes,     CONTENT_TYPE_APPLICATION_X_JAVASCRIPT },
 };
 static int handlers_count = sizeof(handlers) / sizeof(*handlers);
 
@@ -48,13 +57,20 @@ int lingvo_server_request_handler(lingvo_server_request *request, int s)
 
 	for (req_handler *h = handlers; h != handlers_end; ++h) {
 		if (parameter_parse(q, q_end, h->command) == 0) {
-			if (send_response(s,
-					"HTTP/1.1 200 OK\n"
-					"Content-Type: text/html\n"
-					"\n") == -1)
-				return -1;
+			if (h->content_type != NULL) {
+				if (send_response(s,
+						"HTTP/1.1 200 OK\n"
+						"Content-Type: %s\n"
+						"\n",
+						h->content_type) == -1)
+				{
+					return -1;
+				}
+			}
+
 			if (h->proc(request, s) == -1)
 				return -1;
+
 			return 1;
 		}
 	}
