@@ -4,6 +4,26 @@
   <title>File card</title>
   <style>
   .tab_control_item_toggle_off {
+    background-color: #CCFFCC;
+    color: #004400;
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5;
+  }
+  .tab_control_item_toggle_on {
+    background-color: #77CC77;
+    color: #004400;
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5;
+  }
+  .tab_control_item_changed_toggle_off {
     background-color: #ffdddd;
     color: #bb1111;
     font-size: 10pt;
@@ -13,7 +33,7 @@
     text-decoration: underline;
     padding: 5;
   }
-  .tab_control_item_toggle_on {
+  .tab_control_item_changed_toggle_on {
     background-color: #ff5555;
     color: #441111;
     font-size: 10pt;
@@ -30,7 +50,6 @@
     font-weight: bold;
   }
   .btn_submit {
-    background-color: #ffbbbb;
     color: #bb1111;
     font-size: 10pt;
     font-weight: bold;
@@ -46,6 +65,7 @@
     var tab_control1 = {
       doc: document,
       id: "tab_control1",
+      changed: false,
       selected_index: -1,
       elements: [ ],
       on_select_change: on_select_change
@@ -72,14 +92,15 @@
     function tab_control_create(obj) {
       var tc = obj.doc.getElementById(obj.id);
       var html = "";
+      var changed_str = obj.changed ? "_changed" : "";
 
       html =
         "<table>" +
         "<tr>";
       for (var i = 0; i < obj.elements.length; ++i) {
         html +=
-          "<td class=\"tab_control_item_toggle_off\" " +
-          "onclick=\"tab_control_item_click(" + obj.id + ", " + i + ")\">" +
+          "<td class=\"tab_control_item" + changed_str + "_toggle_off\" " +
+          "onclick=\"tab_control_change(" + obj.id + ", " + i + ")\">" +
           obj.elements[i].caption + "</td>";
         obj.on_select_change(obj, i);
       }
@@ -89,23 +110,31 @@
 
       tc.innerHTML = html;
     }
-    function tab_control_item_click(obj, selected_index) {
-      tab_control_set_selected(obj, selected_index);
+    function tab_control_change(obj, selected_index) {
+      obj.changed = true;
+      tab_control_represent_state(obj, selected_index);
     }
     function tab_control_set_selected(obj, selected_index) {
+      obj.changed = false;
+      tab_control_represent_state(obj, selected_index);
+    }
+    function tab_control_represent_state(obj, selected_index) {
       var tc = obj.doc.getElementById(obj.id);
       var tbl = tc.childNodes[0];
       var cells = tbl.childNodes[0].childNodes[0].childNodes;
       var text = "";
+      var changed_str = obj.changed ? "_changed" : "";
 
       obj.selected_index = selected_index;
 
       for (var i = 0; i < cells.length; ++i) {
         if (i == selected_index) {
-          cells[i].className = "tab_control_item_toggle_on";
+          cells[i].className = "tab_control_item" +
+              changed_str + "_toggle_on";
         }
         else {
-          cells[i].className = "tab_control_item_toggle_off";
+          cells[i].className = "tab_control_item" +
+              changed_str + "_toggle_off";
         }
         obj.on_select_change(obj, i);
       }
@@ -114,64 +143,76 @@
 </head>
 <body onload="on_load()">
   <div id="card"></div>
-  <div id="tab_control1"></div>
-  <table id="table_su" border="1">
+  <table>
     <tr>
-      <td>Падеж</td>
-      <td>Вопрос</td>
-      <td>Единственное</td>
-      <td>Множественное</td>
-    </tr>
-    <tr>
-      <td>Именительный</td>
-      <td>Кто? Что?</td>
-      <td><input type="text" name="case1e"></td>
-      <td><input type="text" name="case1m"></td>
-    </tr>
-    <tr>
-      <td>Родительный</td>
-      <td>Чего? Какой?</td>
-      <td><input type="text" name="case2e"></td>
-      <td><input type="text" name="case2m"></td>
-    </tr>
-    <tr>
-      <td>Дательный</td>
-      <td>Кому? Чему?</td>
-      <td><input type="text" name="case3e"></td>
-      <td><input type="text" name="case3m"></td>
-    </tr>
-    <tr>
-      <td>Винительный</td>
-      <td>Кого? Чего?</td>
-      <td><input type="text" name="case4e"></td>
-      <td><input type="text" name="case4m"></td>
-    </tr>
-    <tr>
-      <td>Творительный</td>
-      <td>Кем? Чем?</td>
-      <td><input type="text" name="case5e"></td>
-      <td><input type="text" name="case5m"></td>
-    </tr>
-    <tr>
-      <td>Предложный</td>
-      <td>О ком? О чём?</td>
-      <td><input type="text" name="case6e"></td>
-      <td><input type="text" name="case6m"></td>
-    </tr>
-    <tr>
-      <td class="btn_submit" colspan="4">
-        Обновить в словаре
+      <td style="vertical-align: top;">
+        <div id="tab_control1"></div>
+        <table id="table_su" border="1">
+          <tr>
+            <td>Падеж</td>
+            <td>Вопрос</td>
+            <td>Единственное</td>
+            <td>Множественное</td>
+          </tr>
+          <tr>
+            <td>Именительный</td>
+            <td>Кто? Что?</td>
+            <td><input type="text" name="case1e"></td>
+            <td><input type="text" name="case1m"></td>
+          </tr>
+          <tr>
+            <td>Родительный</td>
+            <td>Чего? Какой?</td>
+            <td><input type="text" name="case2e"></td>
+            <td><input type="text" name="case2m"></td>
+          </tr>
+          <tr>
+            <td>Дательный</td>
+            <td>Кому? Чему?</td>
+            <td><input type="text" name="case3e"></td>
+            <td><input type="text" name="case3m"></td>
+          </tr>
+          <tr>
+            <td>Винительный</td>
+            <td>Кого? Чего?</td>
+            <td><input type="text" name="case4e"></td>
+            <td><input type="text" name="case4m"></td>
+          </tr>
+          <tr>
+            <td>Творительный</td>
+            <td>Кем? Чем?</td>
+            <td><input type="text" name="case5e"></td>
+            <td><input type="text" name="case5m"></td>
+          </tr>
+          <tr>
+            <td>Предложный</td>
+            <td>О ком? О чём?</td>
+            <td><input type="text" name="case6e"></td>
+            <td><input type="text" name="case6m"></td>
+          </tr>
+        </table>
+        <table id="table_pri" border="1">
+          <tr>
+            <td>11</td>
+            <td>12</td>
+          </tr>
+          <tr>
+            <td>21</td>
+            <td>22</td>
+          </tr>
+        </table>
       </td>
-    </tr>
-  </table>
-  <table id="table_pri" border="1">
-    <tr>
-      <td>11</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <td>21</td>
-      <td>22</td>
+      <td style="vertical-align: top;">
+        <table>
+          <tr>
+            <td style="width: 250px;">
+              Внимание!<br>
+              Были сделаны изменения.
+              <span class="btn_submit">Сохранить</td>
+            </td>
+          </tr>
+        </table>
+      </td>
     </tr>
   </table>
 </body>
