@@ -70,6 +70,40 @@
       elements: [ ],
       on_select_change: on_select_change
     };
+    function card_save() {
+      if (top.selected_gr.length == 0) {
+        alert("Как такое может быть? Словогруппа не выбрана.");
+        return;
+      }
+
+      if (tab_control1.changed) {
+        
+      }
+
+      var case1e = document.getElementsByName("case1e")[0];
+      var case1m = document.getElementsByName("case1m")[0];
+      var case2e = document.getElementsByName("case2e")[0];
+      var case2m = document.getElementsByName("case2m")[0];
+      var case3e = document.getElementsByName("case3e")[0];
+      var case3m = document.getElementsByName("case3m")[0];
+      var case4e = document.getElementsByName("case4e")[0];
+      var case4m = document.getElementsByName("case4m")[0];
+      var case5e = document.getElementsByName("case5e")[0];
+      var case5m = document.getElementsByName("case5m")[0];
+      var case6e = document.getElementsByName("case6e")[0];
+      var case6m = document.getElementsByName("case6m")[0];
+
+      if (
+        case1e.value == "" && case1m.value == "" &&
+        case2e.value == "" && case2m.value == "" &&
+        case3e.value == "" && case3m.value == "" &&
+        case4e.value == "" && case4m.value == "" &&
+        case5e.value == "" && case5m.value == "" &&
+        case6e.value == "" && case6m.value == "")
+      {
+        return;
+      }
+    }
     function on_load() {
       tab_control1.elements = [ ];
       for (var i = 0; i < top.wordtypes.length; ++i) {
@@ -88,6 +122,23 @@
       if (el) {
         el.style.display = disp;
       }
+    }
+    function cf_clear(obj) {
+      var cf_obj = document.getElementsByName(obj)[0];
+
+      cf_obj.value = "";
+      cf_obj.focus();
+    }
+    function cf_paste_word(obj) {
+      if (top.selected_gr.length == 0) {
+        alert("Как такое может быть? Словогруппа не выбрана.");
+        return;
+      }
+
+      var cf_obj = document.getElementsByName(obj)[0];
+
+      cf_obj.value = top.wordgroups[top.selected_gr[0]].word;
+      cf_obj.focus();
     }
     function tab_control_create(obj) {
       var tc = obj.doc.getElementById(obj.id);
@@ -157,38 +208,86 @@
           <tr>
             <td>Именительный</td>
             <td>Кто? Что?</td>
-            <td><input type="text" name="case1e"></td>
-            <td><input type="text" name="case1m"></td>
+            <td>
+              <input type="text" name="case1e">
+              <input type="button" value="P" onclick="cf_paste_word('case1e')">
+              <input type="button" value="C" onclick="cf_clear('case1e')">
+            </td>
+            <td>
+              <input type="text" name="case1m">
+              <input type="button" value="P" onclick="cf_paste_word('case1m')">
+              <input type="button" value="C" onclick="cf_clear('case1m')">
+            </td>
           </tr>
           <tr>
             <td>Родительный</td>
             <td>Чего? Какой?</td>
-            <td><input type="text" name="case2e"></td>
-            <td><input type="text" name="case2m"></td>
+            <td>
+              <input type="text" name="case2e">
+              <input type="button" value="P" onclick="cf_paste_word('case2e')">
+              <input type="button" value="C" onclick="cf_clear('case2e')">
+            </td>
+            <td>
+              <input type="text" name="case2m">
+              <input type="button" value="P" onclick="cf_paste_word('case2m')">
+              <input type="button" value="C" onclick="cf_clear('case2m')">
+            </td>
           </tr>
           <tr>
             <td>Дательный</td>
             <td>Кому? Чему?</td>
-            <td><input type="text" name="case3e"></td>
-            <td><input type="text" name="case3m"></td>
+            <td>
+              <input type="text" name="case3e">
+              <input type="button" value="P" onclick="cf_paste_word('case3e')">
+              <input type="button" value="C" onclick="cf_clear('case3e')">
+            </td>
+            <td>
+              <input type="text" name="case3m">
+              <input type="button" value="P" onclick="cf_paste_word('case3m')">
+              <input type="button" value="C" onclick="cf_clear('case3m')">
+            </td>
           </tr>
           <tr>
             <td>Винительный</td>
             <td>Кого? Чего?</td>
-            <td><input type="text" name="case4e"></td>
-            <td><input type="text" name="case4m"></td>
+            <td>
+              <input type="text" name="case4e">
+              <input type="button" value="P" onclick="cf_paste_word('case4e')">
+              <input type="button" value="C" onclick="cf_clear('case4e')">
+            </td>
+            <td>
+              <input type="text" name="case4m">
+              <input type="button" value="P" onclick="cf_paste_word('case4m')">
+              <input type="button" value="C" onclick="cf_clear('case4m')">
+            </td>
           </tr>
           <tr>
             <td>Творительный</td>
             <td>Кем? Чем?</td>
-            <td><input type="text" name="case5e"></td>
-            <td><input type="text" name="case5m"></td>
+            <td>
+              <input type="text" name="case5e">
+              <input type="button" value="P" onclick="cf_paste_word('case5e')">
+              <input type="button" value="C" onclick="cf_clear('case5e')">
+            </td>
+            <td>
+              <input type="text" name="case5m">
+              <input type="button" value="P" onclick="cf_paste_word('case5m')">
+              <input type="button" value="C" onclick="cf_clear('case5m')">
+            </td>
           </tr>
           <tr>
             <td>Предложный</td>
             <td>О ком? О чём?</td>
-            <td><input type="text" name="case6e"></td>
-            <td><input type="text" name="case6m"></td>
+            <td>
+              <input type="text" name="case6e">
+              <input type="button" value="P" onclick="cf_paste_word('case6e')">
+              <input type="button" value="C" onclick="cf_clear('case6e')">
+            </td>
+            <td>
+              <input type="text" name="case6m">
+              <input type="button" value="P" onclick="cf_paste_word('case6m')">
+              <input type="button" value="C" onclick="cf_clear('case6m')">
+            </td>
           </tr>
         </table>
         <table id="table_pri" border="1">
@@ -208,7 +307,7 @@
             <td style="width: 250px;">
               Внимание!<br>
               Были сделаны изменения.
-              <span class="btn_submit">Сохранить</td>
+              <span class="btn_submit" onclick="card_save()">Сохранить</span>
             </td>
           </tr>
         </table>

@@ -15,7 +15,6 @@
     var wordgroups = [
       <?wordlist?>
     ];
-    var cur_word_index = 0;
     var file_text = "<?file_text?>";
     var pos_old = 0;
     var selected = [ ];
@@ -131,7 +130,6 @@
       var card;
 
       card = frame_card.document.getElementById("card");
-      cur_word_index = group_id;
 
       html =
         "Слово: " + wordgroups[group_id].word + "<br>\n" +
