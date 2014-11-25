@@ -15,6 +15,7 @@ lingvo_server_OBJECTS = \
 	handler-dictionary.o \
 	handler-err.o \
 	handler-file.o \
+	handler-files.o \
 	handler-shutdown.o \
 	handler-test.o \
 	handler-wordtypes.o \

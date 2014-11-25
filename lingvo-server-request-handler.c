@@ -1,11 +1,6 @@
+#include "content-types.h"
 #include "lingvo-server-request-handler.h"
 #include "lingvo-server-utils.h"
-
-
-
-
-#define CONTENT_TYPE_TEXT_HTML                   "text/html"
-#define CONTENT_TYPE_APPLICATION_X_JAVASCRIPT    "application/x-javascript"
 
 
 
@@ -25,6 +20,7 @@ int handler_default(lingvo_server_request *request, int s);
 int handler_dictionary(lingvo_server_request *request, int s);
 int handler_err(lingvo_server_request *request, int s);
 int handler_file(lingvo_server_request *request, int s);
+int handler_files(lingvo_server_request *request, int s);
 int handler_shutdown(lingvo_server_request *request, int s);
 int handler_test(lingvo_server_request *request, int s);
 int handler_wordtypes(lingvo_server_request *request, int s);
@@ -36,6 +32,7 @@ static req_handler handlers[] = {
 	{ "",                handler_default,       CONTENT_TYPE_TEXT_HTML                },
 	{ "dictionary",      handler_dictionary,    CONTENT_TYPE_TEXT_HTML                },
 	{ "file",            handler_file,          CONTENT_TYPE_TEXT_HTML                },
+	{ "files",           handler_files,         NULL                                  },
 	{ "shutdown",        handler_shutdown,      CONTENT_TYPE_TEXT_HTML                },
 	{ "test",            handler_test,          CONTENT_TYPE_TEXT_HTML                },
 	{ "wordtypes.js",    handler_wordtypes,     CONTENT_TYPE_APPLICATION_X_JAVASCRIPT },
@@ -63,6 +60,12 @@ int lingvo_server_request_handler(lingvo_server_request *request, int s)
 						"Content-Type: %s\n"
 						"\n",
 						h->content_type) == -1)
+				{
+					return -1;
+				}
+			}
+			else {
+				if (send_response(s, "HTTP/1.1 200 OK\n") == -1)
 				{
 					return -1;
 				}
