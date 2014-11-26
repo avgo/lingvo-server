@@ -78,9 +78,10 @@
         return;
       }
 
-      if (tab_control1.changed) {
-        
-      }
+      var sel = tab_control1.selected_index;
+      var word_type =
+        (0 <= sel && sel < top.wordtypes.length) ? 
+        "type=" + top.wordtypes[sel].id + "&" : "" ;
 
       var case1e = document.getElementsByName("case1e")[0];
       var case1m = document.getElementsByName("case1m")[0];
@@ -105,6 +106,38 @@
       {
         return;
       }
+
+      var req = new XMLHttpRequest();
+      if (!req) {
+        return ;
+      }
+
+      req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
+          var resp = req.responseText;
+          if (resp != "ok") {
+            alert("fail");
+            return;
+          }
+          proc(obj);
+        }
+      }
+
+      req.open("POST", "/test", true);
+      req.send(
+        word_type +
+        "case1e=" + encodeURIComponent(case1e.value) + "&" +
+        "case1m=" + encodeURIComponent(case1m.value) + "&" +
+        "case2e=" + encodeURIComponent(case2e.value) + "&" +
+        "case2m=" + encodeURIComponent(case2m.value) + "&" +
+        "case3e=" + encodeURIComponent(case3e.value) + "&" +
+        "case3m=" + encodeURIComponent(case3m.value) + "&" +
+        "case4e=" + encodeURIComponent(case4e.value) + "&" +
+        "case4m=" + encodeURIComponent(case4m.value) + "&" +
+        "case5e=" + encodeURIComponent(case5e.value) + "&" +
+        "case5m=" + encodeURIComponent(case5m.value) + "&" +
+        "case6e=" + encodeURIComponent(case6e.value) + "&" +
+        "case6m=" + encodeURIComponent(case6m.value));
     }
     function on_load() {
       tab_control1.elements = [ ];
