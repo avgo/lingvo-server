@@ -1,4 +1,5 @@
 #include <lingvo/dict_maria_db.h>
+#include <lingvo/lingvo.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -55,7 +56,8 @@ int action_add(dict_action *da)
 	else {
 		printf("word: '%s'\n", word);
 
-		result = lingvo_dictionary_add_word(da->dict, word);
+		result = lingvo_dictionary_add_word(
+			da->dict, word, WORD_TYPE_P_UNKNOWN);
 		if (result == -1) {
 			ret = QUERY_ACTION_SYSERROR; goto END;
 		}
