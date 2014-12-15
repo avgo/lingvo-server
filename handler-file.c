@@ -107,7 +107,11 @@ static int fill_wordlist(domutils_string *file_str,
 		int in_dict;
 		unsigned int word_type = 1;
 
+#if 0
 		in_dict = lingvo_dictionary_get_word(&dict, word, &word_type);
+#else
+		in_dict = 0;
+#endif
 		if (in_dict == -1) {
 			printf("can't obtain word!\n");
 			// ret == -1; goto END;

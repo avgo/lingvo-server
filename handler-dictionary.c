@@ -56,8 +56,8 @@ int action_add(dict_action *da)
 	else {
 		printf("word: '%s'\n", word);
 
-		result = lingvo_dictionary_add_word(
-			da->dict, word, WORD_TYPE_P_UNKNOWN);
+		/* result = lingvo_dictionary_add_word(
+			da->dict, word, WORD_TYPE_P_UNKNOWN); */
 		if (result == -1) {
 			ret = QUERY_ACTION_SYSERROR; goto END;
 		}

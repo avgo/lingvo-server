@@ -37,83 +37,20 @@
   </style>
   <script>
     function add_del_word(el, word_index) {
-      var action = "";
-
-      if (top.wordgroups[word_index].in_dict) {
-        action = "delete";
-      }
-      else {
-        action = "add";
-      }
-
-      var word = top.wordgroups[word_index].word;
-
-      dict_ajax(
-        "action=" + action + "&word=" + encodeURIComponent(word),
-        add_del_word_proc,
-        { "el": el, "word_index": word_index });
-    }
-    function add_del_word_proc(obj) {
-      if (top.wordgroups[obj.word_index].in_dict) {
-        obj.el.innerHTML = "add";
-        obj.el.className = "not_in_dict";
-        top.wordgroups[obj.word_index].in_dict = false;
-      }
-      else {
-        obj.el.innerHTML = "del";
-        obj.el.className = "in_dict";
-        top.wordgroups[obj.word_index].in_dict = true;
-      }
-    }
-    function dict_ajax(query, proc, obj) {
-      var req = new XMLHttpRequest();
-      if (!req) {
-        return ;
-      }
-      req.onreadystatechange = function () {
-        if (req.readyState == 4 && req.status == 200) {
-          var resp = req.responseText;
-          if (resp != "ok") {
-            alert("fail");
-            return;
-          }
-          proc(obj);
-        }
-      }
-      req.open("POST", "/dictionary", true);
-      req.send(query);
     }
     function form_load() {
       var html = "<table>";
       for (var i = 0; i < top.wordgroups.length; ++i) {
-        var add_to_dict;
         var class_name = "", text = "";
         var type_code = top.wordgroups[i].type;
         var name_short;
 
         name_short = (type_code == -1) ? "" : top.wordtypes[type_code].name_short;
 
-        if (top.wordgroups[i].in_dict) {
-          class_name = "in_dict";
-          text = "del";
-        }
-        else {
-          class_name = "not_in_dict";
-          text = "add";
-        }
-
-        add_to_dict =
-          "<td id=\"td" + i + "\" class=\"" + class_name +
-          "\" onclick=\"add_del_word(this, " + i + ")\">" +
-          text +
-          "</td>";
-
         html +=
           "<tr id=\"tr" + i + "\" class=\"group_not_selected\">\n" +
           "<td onclick=\"top.select_group(" + i + ", false)\">" + top.wordgroups[i].word + "</td>\n" +
           "<td>" + top.wordgroups[i].count + "</td>\n" +
-          "<td>" + name_short + "</td>\n" +
-          add_to_dict + "\n" +
           "</tr>\n";
       }
       html += "</table>";
